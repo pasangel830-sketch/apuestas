@@ -1,0 +1,22 @@
+# Compiler files
+cache/
+out/
+
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
+
+# Dotenv file (no subir secretos ni DATABASE_URL reales)
+.env
+.env.*
+!.env.example
+
+# Cursor / IDE local
+.cursor/
+
+# API deportiva mock (resultados publicados)
+frontend/server/data/sports-results.json

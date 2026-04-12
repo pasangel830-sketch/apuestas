@@ -1,0 +1,1747 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.main {
+  flex: 1;
+  padding: 1rem 1rem 2rem;
+  max-width: var(--content-max, 1400px);
+  margin: 0 auto;
+  width: 100%;
+  text-align: left;
+}
+
+@media (min-width: 640px) {
+  .main {
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main {
+    padding: 2rem 2rem 3rem;
+  }
+}
+
+.main:has(.page.home),
+.main:has(.create-porra-page) {
+  max-width: 720px;
+}
+
+/* Detalle porra: cuadro de mandos en rejilla 2×n (más ancho que el resto de .page.home) */
+.main:has(.porra-detail) {
+  max-width: min(1180px, 100%);
+}
+
+.page h1 {
+  margin-top: 0;
+  font-size: 1.75rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.lead {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.5rem;
+}
+
+.hint {
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.6em 1.2em;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background-color: var(--accent-blue);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent-blue) 40%, transparent);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--accent-blue) 12%, transparent);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+.form label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.form label input {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.form fieldset {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.form .row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.form .row input {
+  flex: 1;
+}
+
+.error {
+  color: var(--accent-red);
+  margin-top: 0.5rem;
+}
+
+.error-box {
+  color: var(--accent-red);
+  background: color-mix(in srgb, var(--accent-red) 10%, transparent);
+  border: 1px solid var(--accent-red);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+.error-box strong {
+  color: var(--accent-red);
+}
+
+.success {
+  color: var(--accent-green);
+  margin-top: 0.5rem;
+}
+
+.porra-list {
+  list-style: none;
+  padding: 0;
+}
+
+.porra-list li {
+  margin-bottom: 0.5rem;
+}
+
+.porra-list-item-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.porra-list-item-link:hover .porra-list-contract {
+  text-decoration: underline;
+}
+
+.porra-list-match-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.porra-list-contract {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.porra-detail .porra-winners-banner {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: rgba(40, 160, 90, 0.12);
+  border: 1px solid rgba(40, 160, 90, 0.35);
+}
+
+.porra-detail .porra-winners-banner p {
+  margin-bottom: 0;
+}
+
+/* Clasificación: lista de participantes con filas legibles */
+.porra-leaderboard {
+  --porra-lb-pick-home: rgba(52, 211, 153, 0.22);
+  --porra-lb-pick-draw: rgba(148, 163, 184, 0.2);
+  --porra-lb-pick-away: rgba(56, 189, 248, 0.22);
+}
+
+.porra-leaderboard__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.porra-leaderboard__head .home-hero__title {
+  margin-bottom: 0;
+}
+
+.porra-leaderboard__count {
+  flex-shrink: 0;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--porra-label);
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 999px;
+}
+
+.porra-leaderboard__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.page.home.porra-detail section.card ul.porra-leaderboard__list {
+  padding-left: 0;
+  margin-left: 0;
+}
+
+.porra-leaderboard__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem 0.75rem;
+  padding: 0.65rem 0.75rem 0.65rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: color-mix(in srgb, var(--bg-primary) 55%, rgba(15, 23, 42, 0.65));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.porra-leaderboard__item:hover {
+  border-color: rgba(56, 189, 248, 0.28);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(125, 211, 252, 0.05);
+}
+
+.porra-leaderboard__item--winner {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgba(16, 185, 129, 0.14) 100%, transparent),
+    color-mix(in srgb, var(--bg-primary) 70%, rgba(15, 23, 42, 0.5))
+  );
+  box-shadow:
+    0 0 0 1px rgba(52, 211, 153, 0.12),
+    inset 0 1px 0 rgba(167, 243, 208, 0.08);
+}
+
+.porra-leaderboard__rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--porra-label);
+  background: rgba(2, 6, 23, 0.55);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.porra-leaderboard__item--winner .porra-leaderboard__rank {
+  color: #a7f3d0;
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(6, 78, 59, 0.35);
+}
+
+.porra-leaderboard__body {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.85rem;
+}
+
+.porra-leaderboard__who {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.porra-leaderboard__name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--porra-label);
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.porra-leaderboard__addr {
+  display: block;
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  opacity: 0.88;
+  word-break: break-all;
+}
+
+.porra-leaderboard__pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding: 0.35rem 0.55rem 0.35rem 0.4rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.porra-leaderboard__pick-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  padding: 0.12rem 0.28rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #f8fafc;
+}
+
+.porra-leaderboard__pick-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--porra-text-muted);
+  max-width: 11rem;
+  line-height: 1.25;
+}
+
+@media (min-width: 520px) {
+  .porra-leaderboard__pick-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.porra-leaderboard__pick--0 {
+  background: var(--porra-lb-pick-home);
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+.porra-leaderboard__pick--0 .porra-leaderboard__pick-code {
+  background: rgba(6, 95, 70, 0.65);
+  color: #d1fae5;
+}
+
+.porra-leaderboard__pick--1 {
+  background: var(--porra-lb-pick-draw);
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.porra-leaderboard__pick--1 .porra-leaderboard__pick-code {
+  background: rgba(71, 85, 105, 0.75);
+}
+
+.porra-leaderboard__pick--2 {
+  background: var(--porra-lb-pick-away);
+  border-color: rgba(56, 189, 248, 0.32);
+}
+
+.porra-leaderboard__pick--2 .porra-leaderboard__pick-code {
+  background: rgba(12, 74, 110, 0.65);
+  color: #e0f2fe;
+}
+
+.porra-leaderboard__winner-pill {
+  grid-column: 3;
+  padding: 0.22rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #064e3b;
+  background: rgba(167, 243, 208, 0.95);
+  border-radius: 999px;
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  white-space: nowrap;
+}
+
+.porra-leaderboard__empty {
+  margin: 0.25rem 0 0;
+  padding: 1rem 1rem 1.1rem;
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--porra-text-muted);
+  border-radius: 10px;
+  border: 1px dashed rgba(148, 163, 184, 0.28);
+  background: rgba(2, 6, 23, 0.25);
+}
+
+@media (max-width: 520px) {
+  .porra-leaderboard__item {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  .porra-leaderboard__rank {
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+
+  .porra-leaderboard__body {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .porra-leaderboard__winner-pill {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+  }
+}
+
+.porra-detail-welcome {
+  margin: 0 0 1.1rem 0;
+  padding: 1rem 1.15rem 1.05rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent-warm, #f59e0b) 28%, rgba(148, 163, 184, 0.35));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-warm, #f59e0b) 12%, rgba(15, 23, 42, 0.55)) 0%,
+    rgba(15, 23, 42, 0.35) 100%
+  );
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+}
+
+.porra-detail-welcome__text {
+  margin: 0;
+  font-size: clamp(0.95rem, 0.88rem + 0.35vw, 1.05rem);
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text-primary) 94%, #fef3c7);
+}
+
+.porra-detail-welcome__name {
+  font-weight: 800;
+  color: color-mix(in srgb, #fde68a 85%, var(--text-primary));
+  letter-spacing: 0.02em;
+}
+
+.porra-detail-match-label {
+  font-size: clamp(1.28rem, 1.1rem + 1vw, 1.55rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  margin-top: -0.2rem;
+  margin-bottom: 0.65rem;
+  color: var(--text-primary);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--bg-primary) 40%, transparent);
+}
+
+.porra-detail-contract-block {
+  margin-bottom: 1rem;
+}
+
+.porra-detail-contract-label {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent-blue) 92%, #fff);
+}
+
+.porra-detail .porra-detail-contract-address.address {
+  margin-top: 0;
+}
+
+.porra-detail .address {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #888;
+  word-break: break-all;
+}
+
+.porra-detail .info-tecnica .address {
+  margin: 0.25rem 0 1rem 0;
+}
+
+.porra-detail .info-tecnica .address:last-of-type {
+  margin-bottom: 0;
+}
+
+/*
+ * Solo la vista detalle de una porra (/porra/:addr): tipografía ~30 % más compacta.
+ * La TopBar y el resto de rutas no se ven afectadas (zoom solo en este subárbol).
+ * El temporizador compensa el zoom de la página para verse a tamaño legible en todo momento.
+ */
+.page.home.porra-detail {
+  zoom: 0.7;
+}
+
+.page.home.porra-detail .betting-countdown-card__timer {
+  zoom: calc(1 / .25);
+}
+
+.porra-detail-dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem 1.25rem;
+  align-items: stretch;
+  margin-top: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .porra-detail-dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Mismo ancho que la fila completa del dashboard (p. ej. «Apostar y resolver») */
+  .porra-detail-dashboard > section.card.actions,
+  .porra-detail-dashboard > section.card.porra-detail-summary,
+  .porra-detail-dashboard > section.card.porra-leaderboard {
+    grid-column: 1 / -1;
+  }
+}
+
+.porra-detail-dashboard > section.card,
+.porra-detail-dashboard > .card.betting-countdown-card {
+  margin-bottom: 0;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.page.home.porra-detail .porra-detail-dashboard > .card.betting-countdown-card {
+  padding: 1.35rem 1.4rem;
+}
+
+/* Misma altura mínima del bloque superior en ambas tarjetas para alinear los contadores en columnas. */
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__intro {
+  flex: 0 0 auto;
+  min-height: 11.5rem;
+}
+
+/* Espaciado más compacto sin desalinear los contadores entre columnas */
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__badge {
+  margin-bottom: 0.35rem;
+}
+
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__title {
+  margin-bottom: 0.3rem;
+}
+
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__subtitle {
+  margin-bottom: 0.45rem;
+}
+
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__timer {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  line-height: 1;
+}
+
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__deadline,
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__chain-hint,
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__ended-msg {
+  margin-top: 0.2rem;
+}
+
+.porra-detail-dashboard > .card.betting-countdown-card .betting-countdown-card__ended-msg {
+  padding: 0.5rem 0.65rem;
+}
+
+/* Paneles tipo mandos: títulos más compactos y jerarquía clara */
+.porra-detail-dashboard .home-hero__badge {
+  margin-bottom: 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.porra-detail-dashboard .home-hero__title {
+  margin-bottom: 0.65rem;
+  font-size: clamp(1.05rem, 0.95rem + 0.55vw, 1.28rem);
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+}
+
+.porra-detail-dashboard .home-hero__subtitle {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin-bottom: 0.6rem;
+}
+
+/* Resumen «Estado»: tres métricas en columnas */
+.porra-detail-summary__head .home-hero__title {
+  margin-bottom: 0.5rem;
+}
+
+.porra-detail-summary__stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+@media (min-width: 520px) {
+  .porra-detail-summary__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.porra-detail-summary__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 10px;
+  text-align: center;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--accent-blue) 14%, transparent) 0%,
+    rgba(15, 23, 42, 0.65) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--accent-blue) 28%, transparent);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(125, 211, 252, 0.08);
+  min-width: 0;
+}
+
+.porra-detail-summary__stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--porra-text-muted);
+  line-height: 1.25;
+}
+
+.porra-detail-summary__stat-value {
+  font-size: clamp(0.95rem, 0.88rem + 0.35vw, 1.12rem);
+  font-weight: 800;
+  color: var(--porra-label);
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.porra-detail-summary__stat-value--mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+}
+
+.porra-detail-summary .porra-detail-summary__stats + p {
+  margin-top: 1rem;
+}
+
+.porra-detail-dashboard section.card p:not(.home-hero__badge):not(.home-hero__subtitle),
+.porra-detail-dashboard section.card li {
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.porra-detail-dashboard section.card .hint {
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.porra-detail-dashboard section.card ul.address-list .address-list__name {
+  font-size: 0.98rem;
+}
+
+.porra-detail-dashboard section.card ul.address-list .address-list__addr {
+  font-size: 0.78rem;
+}
+
+.porra-detail-dashboard section.card ul {
+  flex: 1;
+  min-height: 0;
+  max-height: min(240px, 32vh);
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  margin-right: -0.2rem;
+}
+
+.porra-detail-dashboard section.card ul::-webkit-scrollbar {
+  width: 6px;
+}
+
+.porra-detail-dashboard section.card ul::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.35);
+  border-radius: 999px;
+}
+
+.porra-detail-dashboard section.card.actions {
+  gap: 0.75rem;
+}
+
+.porra-detail-dashboard section.card.actions > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.porra-detail-dashboard section.card.actions > .porra-actions-bet,
+.porra-detail-dashboard section.card.actions > .porra-actions-notice,
+.porra-detail-dashboard section.card.actions > .porra-actions-resolve {
+  gap: 0.75rem;
+}
+
+/* Fase apostar / resultado: jerarquía y cuadrícula 1–X–2 */
+.porra-actions-phase-head {
+  margin: 0 0 0.25rem;
+}
+
+.porra-actions-phase-label {
+  display: inline-block;
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent-blue, #38bdf8) 85%, #94a3b8);
+}
+
+.porra-actions-phase-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: #e0f2fe;
+}
+
+.porra-actions-phase-desc {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, #bae6fd 75%, #64748b);
+  max-width: 36rem;
+}
+
+.porra-actions-stake {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, #0f172a 65%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-blue, #38bdf8) 22%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #7dd3fc 8%, transparent);
+}
+
+.porra-actions-stake__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.02em;
+}
+
+.porra-actions-stake__value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #e0f2fe;
+}
+
+.porra-outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  width: 100%;
+}
+
+@media (max-width: 420px) {
+  .porra-outcome-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.porra-outcome-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 4.6rem;
+  width: 100%;
+  padding: 0.65rem 0.4rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.porra-outcome-btn__code {
+  font-size: 1.35rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: #7dd3fc;
+}
+
+.porra-outcome-btn__line {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: color-mix(in srgb, #bae6fd 88%, #64748b);
+  max-width: 100%;
+}
+
+.porra-outcome-btn:hover:not(:disabled) .porra-outcome-btn__code {
+  color: #e0f2fe;
+}
+
+.porra-actions-notice--done {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  background: color-mix(in srgb, #14532d 35%, transparent);
+  border: 1px solid color-mix(in srgb, #4ade80 35%, transparent);
+  color: #bbf7d0;
+}
+
+.porra-actions-resolve {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid color-mix(in srgb, var(--accent-blue, #38bdf8) 18%, transparent);
+}
+
+.porra-actions-resolve .btn-outline {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.porra-actions-resolve .btn-outline:disabled {
+  opacity: 0.45;
+  border-color: color-mix(in srgb, var(--accent-blue, #38bdf8) 35%, #475569);
+  color: color-mix(in srgb, var(--accent-blue, #38bdf8) 85%, #94a3b8);
+  background: color-mix(in srgb, #0f172a 50%, transparent);
+}
+
+.porra-actions-resolve-hint {
+  margin: 0 0 0.25rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  border-left: 3px solid color-mix(in srgb, var(--accent-blue, #38bdf8) 55%, transparent);
+  background: color-mix(in srgb, #0c4a6e 22%, transparent);
+}
+
+/* Acento lateral tipo panel de control */
+.porra-detail-dashboard > section.card::before,
+.porra-detail-dashboard > .card.betting-countdown-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 12px 0 0 12px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.85), rgba(14, 165, 233, 0.35));
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.porra-detail-dashboard > .card.betting-countdown-card::before {
+  background: linear-gradient(180deg, #fb923c, rgba(234, 88, 12, 0.45));
+}
+
+.porra-detail-dashboard .betting-countdown-card__title {
+  font-size: clamp(1rem, 0.92rem + 0.3vw, 1.2rem);
+}
+
+.porra-detail-dashboard #match-end-countdown-title {
+  font-size: clamp(0.81rem, calc(0.7452rem + 0.243vw), 0.972rem);
+}
+
+.porra-detail-dashboard .betting-countdown-card__timer {
+  font-size: clamp(2.7rem, 5vw + 1rem, 3.8rem);
+}
+
+.porra-detail-dashboard .betting-countdown-card__subtitle,
+.porra-detail-dashboard .betting-countdown-card__deadline,
+.porra-detail-dashboard .betting-countdown-card__chain-hint,
+.porra-detail-dashboard .betting-countdown-card__ended-msg {
+  font-size: 0.82rem;
+}
+
+/* Cuenta atrás hasta cierre de apuestas (énfasis naranja) */
+.betting-countdown-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, #fb923c 55%, transparent);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, #ea580c 18%, transparent) 0%, rgba(15, 23, 42, 0.92) 55%),
+    radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, #f97316 28%, transparent), transparent 55%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #fdba74 12%, transparent),
+    0 12px 40px color-mix(in srgb, #ea580c 22%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fed7aa 10%, transparent);
+}
+
+.betting-countdown-card__intro {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.betting-countdown-card__badge {
+  display: inline-block;
+  margin: 0 0 0.5rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffedd5;
+  background: color-mix(in srgb, #c2410c 35%, transparent);
+  border: 1px solid color-mix(in srgb, #fb923c 45%, transparent);
+}
+
+.betting-countdown-card__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+  font-family: var(--font-display);
+  color: #fff7ed;
+  text-shadow: 0 1px 12px color-mix(in srgb, #ea580c 35%, transparent);
+}
+
+#match-end-countdown-title {
+  font-size: calc(1.2rem * 0.81);
+}
+
+.betting-countdown-card__subtitle {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, #ffedd5 88%, #0f172a);
+  max-width: 36rem;
+}
+
+.betting-countdown-card__sync {
+  margin: 0;
+  color: #fed7aa;
+  font-size: 0.95rem;
+}
+
+.betting-countdown-card__timer {
+  margin: 0.25rem 0 0.75rem;
+  font-size: clamp(3.5rem, 10vw, 4.7rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: #fffbeb;
+  text-shadow:
+    0 0 24px color-mix(in srgb, #f97316 55%, transparent),
+    0 2px 0 color-mix(in srgb, #9a3412 40%, transparent);
+  animation: betting-countdown-pulse 1.2s ease-in-out infinite;
+}
+
+.betting-countdown-card__timer.betting-countdown-card__timer--ended {
+  animation: none;
+  color: #ffedd5;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+  opacity: 0.95;
+}
+
+.betting-countdown-card__deadline,
+.betting-countdown-card__chain-hint,
+.betting-countdown-card__ended-msg {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, #ffedd5 92%, transparent);
+}
+
+.betting-countdown-card__ended-msg {
+  font-weight: 500;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, #7c2d12 28%, transparent);
+  border: 1px solid color-mix(in srgb, #fb923c 35%, transparent);
+}
+
+@keyframes betting-countdown-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.08);
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .betting-countdown-card__timer:not(.betting-countdown-card__timer--ended) {
+    animation: none;
+  }
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.form-page .form {
+  max-width: 500px;
+}
+
+/* Crear porra + inicio (hero): mismo tema de superficie y tipografía azul claro */
+.create-porra-page,
+.page.home {
+  --porra-label: #bae6fd;
+  --porra-text-muted: #7dd3fc;
+  --porra-input-fg: #e0f2fe;
+  --porra-input-bg: rgba(15, 23, 42, 0.75);
+  --porra-form-surface: #0f172a;
+}
+
+.create-porra-page h1 {
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.85rem, 4vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: #e0f2fe;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .create-porra-page h1,
+  .page.home .home-hero__title {
+    background: linear-gradient(115deg, #e0f2fe 0%, #7dd3fc 55%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.create-porra-page .form.card {
+  max-width: 520px;
+  padding: 1.75rem 1.5rem;
+  background: var(--porra-form-surface);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow:
+    0 8px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(125, 211, 252, 0.06);
+}
+
+.create-porra-page .form > label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--porra-label);
+  letter-spacing: 0.01em;
+}
+
+.create-porra-page .form label small,
+.create-porra-page .create-porra-participants-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--porra-text-muted);
+}
+
+.create-porra-page .form label small a,
+.create-porra-page .form .hint a {
+  color: #a5f3fc;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.create-porra-page .form label small a:hover,
+.create-porra-page .form .hint a:hover {
+  color: #e0f2fe;
+}
+
+.create-porra-page .form .hint {
+  color: var(--porra-text-muted);
+}
+
+.create-porra-page .create-porra-participants-hint {
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+}
+
+.create-porra-page .form label input,
+.create-porra-page .form label select,
+.create-porra-page .form .row input {
+  margin-top: 0.4rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  background: var(--porra-input-bg);
+  color: var(--porra-input-fg);
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.5),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.create-porra-page .form label input::placeholder,
+.create-porra-page .form .row input::placeholder {
+  color: rgba(125, 211, 252, 0.45);
+}
+
+.create-porra-page .form label select {
+  width: 100%;
+  max-width: 420px;
+  cursor: pointer;
+}
+
+.create-porra-page .form label select.create-porra-match-select {
+  font-size: clamp(0.72rem, 0.68rem + 0.5vw, 0.8rem);
+  line-height: 1.35;
+  padding: clamp(0.45rem, 0.38rem + 0.35vw, 0.55rem) clamp(0.55rem, 0.48rem + 0.4vw, 0.65rem);
+}
+
+.create-porra-page .form label select option {
+  background: var(--porra-form-surface);
+  color: var(--porra-input-fg);
+}
+
+.create-porra-page .form label input:focus,
+.create-porra-page .form label select:focus,
+.create-porra-page .form .row input:focus {
+  outline: none;
+  border-color: rgba(56, 189, 248, 0.85);
+  box-shadow:
+    0 0 0 1px rgba(14, 165, 233, 0.4),
+    0 0 22px rgba(56, 189, 248, 0.2);
+}
+
+/* Fecha/hora: picker oscuro para coherencia con el formulario */
+.create-porra-page input[type='datetime-local'] {
+  color-scheme: dark;
+}
+
+/*
+ * Icono del calendario: en algunos Chromium el icono nativo queda casi negro sobre fondo oscuro
+ * pese a color-scheme. Icono SVG propio en azul claro del tema para contraste fiable.
+ */
+.create-porra-page input[type='datetime-local']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-left: 0.15rem;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237dd3fc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Flechas del input numérico visibles sobre fondo oscuro (Chrome, Edge, Safari) */
+.create-porra-page input[type='number']::-webkit-inner-spin-button,
+.create-porra-page input[type='number']::-webkit-outer-spin-button {
+  opacity: 1;
+  cursor: pointer;
+  height: 2.25rem;
+  filter: invert(70%) sepia(30%) saturate(900%) hue-rotate(165deg) brightness(103%) contrast(101%);
+}
+
+.create-porra-page input[type='number'] {
+  color-scheme: dark;
+}
+
+.create-porra-page .form fieldset {
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  background: rgba(2, 6, 23, 0.45);
+}
+
+.create-porra-page .form fieldset legend {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--porra-label);
+  padding: 0 0.4rem;
+}
+
+.acceder-porra {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* Tarjetas con el mismo contenedor que el hero de inicio (éxito crear porra + detalle porra) */
+.page.home.create-porra-page section.card,
+.page.home.porra-detail section.card {
+  position: relative;
+  padding: 1.75rem 1.5rem;
+  margin: 0 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--porra-form-surface);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow:
+    0 8px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(125, 211, 252, 0.06);
+}
+
+.page.home.porra-detail section.card .home-hero__title {
+  margin-bottom: 0.85rem;
+}
+
+.page.home.porra-detail section.card p:not(.home-hero__badge):not(.home-hero__subtitle) {
+  color: var(--porra-text-muted);
+  line-height: 1.55;
+}
+
+.page.home.porra-detail section.card p strong {
+  color: var(--porra-label);
+}
+
+.page.home.porra-detail section.card .error-box,
+.page.home.porra-detail section.card .error-box p {
+  color: var(--accent-red);
+}
+
+.page.home.porra-detail section.card .error-box strong {
+  color: inherit;
+}
+
+.page.home.porra-detail section.card .porra-winners-banner p {
+  color: var(--text-primary);
+}
+
+.page.home.porra-detail section.card .success {
+  color: var(--accent-green);
+}
+
+.page.home.porra-detail section.card ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--porra-text-muted);
+}
+
+.page.home.porra-detail section.card ul.address-list {
+  word-break: break-all;
+}
+
+.page.home.porra-detail section.card ul.address-list .address-list__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.page.home.porra-detail section.card ul.address-list .address-list__name {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--porra-label);
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+}
+
+.page.home.porra-detail section.card ul.address-list .address-list__addr {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--porra-text-muted);
+  line-height: 1.45;
+  opacity: 0.95;
+}
+
+.page.home.porra-detail section.card ul li {
+  margin-bottom: 0.25rem;
+  line-height: 1.55;
+}
+
+.page.home.porra-detail section.card .hint {
+  font-size: 0.9rem;
+  margin-top: 0.35rem;
+}
+
+.page.home.porra-detail section.card .home-hero__subtitle {
+  margin-bottom: 0.75rem;
+}
+
+.page.home.create-porra-page section.card .home-hero__subtitle {
+  margin-bottom: 0.75rem;
+}
+
+.page.home.create-porra-page section.card .create-success-contract-address {
+  margin: 0;
+  font-family: monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+  line-height: 1.5;
+  color: var(--porra-text-muted);
+}
+
+.acceder-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.acceder-form .acceder-input {
+  flex: 1;
+  min-width: 200px;
+  max-width: 420px;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-color-scheme: light) {
+  .card {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* —— Inicio BuddyBets: hero como la tarjeta .form.card de Crear porra —— */
+.page.home .home-hero {
+  position: relative;
+  padding: 1.75rem 1.5rem;
+  margin: 0 0 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--porra-form-surface);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow:
+    0 8px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(125, 211, 252, 0.06);
+}
+
+.page.home .home-hero__badge {
+  display: inline-block;
+  margin: 0 0 0.65rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--porra-label);
+  background: rgba(2, 6, 23, 0.45);
+  border-radius: 999px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+}
+
+.page.home .home-hero__title {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.85rem, 4vw, 2.35rem);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #e0f2fe;
+}
+
+.page.home .home-hero__subtitle {
+  margin: 0;
+  max-width: 34em;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--porra-text-muted);
+}
+
+.home-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.page.home .home-how__intro {
+  margin: 0 0 1.25rem;
+  color: #f1f5f9;
+  line-height: 1.6;
+}
+
+.home-steps {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.home-steps li {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.home-steps__n {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 10px;
+  background: rgba(100, 108, 255, 0.25);
+  border: 1px solid rgba(100, 108, 255, 0.45);
+  color: #fff;
+}
+
+@media (prefers-color-scheme: light) {
+  .home-steps__n {
+    color: #3d42c8;
+    background: rgba(100, 108, 255, 0.12);
+    border-color: rgba(100, 108, 255, 0.35);
+  }
+}
+
+.home-example {
+  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  background: rgba(40, 180, 140, 0.08);
+  border: 1px solid rgba(40, 180, 140, 0.28);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.home-example__label {
+  margin: 0 0 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(80, 220, 170, 0.95);
+}
+
+@media (prefers-color-scheme: light) {
+  .home-example {
+    background: rgba(40, 160, 120, 0.06);
+    border-color: rgba(30, 140, 100, 0.25);
+  }
+  .home-example__label {
+    color: #1a7a58;
+  }
+}
+
+.home-example p:last-child {
+  margin: 0;
+}
+
+/* CTA inicio: misma tarjeta que hero / formulario Crear porra */
+.page.home .home-cta {
+  margin: 2rem 0 1.25rem;
+}
+
+.page.home .home-cta__inner {
+  padding: 1.75rem 1.5rem;
+  border-radius: 12px;
+  background: var(--porra-form-surface);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow:
+    0 8px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(125, 211, 252, 0.06);
+  text-align: center;
+}
+
+.page.home .home-cta__headline {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.2rem, 2.8vw, 1.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--porra-label);
+}
+
+.page.home .home-cta__text {
+  margin: 0 0 1.25rem;
+  max-width: 28em;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--porra-text-muted);
+}
+
+.page.home .home-cta__button {
+  font-size: 1.05rem;
+  padding: 0.75em 1.75em;
+}
+
+.page.home .home-cta__hint {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--porra-text-muted);
+}
+
+.home-secondary-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.home-acceder {
+  margin-bottom: 0;
+}
+
+.home-acceder__title {
+  font-size: 1.05rem;
+}
+
+/* —— Mis porras: mismo ancho que Inicio (720px) vía .page.home —— */
+.my-porras .my-porras-status {
+  margin: 0 0 1rem;
+}
+
+.my-porras-status__text {
+  margin: 0;
+  color: var(--porra-text-muted);
+  font-size: 0.95rem;
+}
+
+.my-porras-empty-card {
+  margin-bottom: 0;
+}
+
+.my-porras-empty-card__text {
+  margin: 0;
+  line-height: 1.55;
+  color: #f1f5f9;
+}
+
+.my-porras-empty-card__text a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.my-porras-empty-card__text a:hover {
+  text-decoration: underline;
+}
+
+.my-porras-dates-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--porra-text-muted);
+}
+
+.my-porras-entries {
+  margin: 0;
+}
+
+.my-porras-list.porra-list li {
+  margin-bottom: 0.65rem;
+}
+
+.my-porras-list.porra-list li:last-child {
+  margin-bottom: 0;
+}
+
+.my-porras-entry-link {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--porra-form-surface);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow:
+    0 8px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(125, 211, 252, 0.06);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.my-porras-entry-link:hover {
+  border-color: rgba(56, 189, 248, 0.38);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(125, 211, 252, 0.1);
+}
+
+.my-porras-entry-link__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.my-porras-entry-link__meta {
+  flex-shrink: 0;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.my-porras-entry-link__phase {
+  line-height: 1;
+}
+
+.porra-list-phase {
+  display: inline-block;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.porra-list-phase--pending {
+  color: var(--porra-text-muted);
+  background: rgba(15, 23, 42, 0.5);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.porra-list-phase--betting {
+  color: #a5f3fc;
+  background: rgba(6, 78, 59, 0.35);
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.porra-list-phase--resolving {
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.35);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.porra-list-phase--claiming {
+  color: #e9d5ff;
+  background: rgba(76, 29, 149, 0.35);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.porra-list-phase--finished {
+  color: rgba(226, 232, 240, 0.85);
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.porra-list-match-title--muted {
+  font-weight: 500;
+  color: var(--porra-text-muted);
+}
+
+.porra-list-created {
+  font-size: 0.82rem;
+  color: rgba(224, 242, 254, 0.92);
+  white-space: nowrap;
+}
+
+.porra-list-created--pending {
+  color: var(--porra-text-muted);
+}
+
+.porra-list-created--na {
+  color: var(--porra-text-muted);
+}
+
+@media (max-width: 520px) {
+  .my-porras-entry-link {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .my-porras-entry-link__meta {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .porra-list-created {
+    white-space: normal;
+  }
+}

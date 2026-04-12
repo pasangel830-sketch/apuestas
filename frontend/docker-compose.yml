@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: apuestas
+      POSTGRES_PASSWORD: apuestas
+      POSTGRES_DB: apuestas
+    ports:
+      - '5433:5432'
+    volumes:
+      - apuestas_oracle_pg:/var/lib/postgresql/data
+
+volumes:
+  apuestas_oracle_pg:

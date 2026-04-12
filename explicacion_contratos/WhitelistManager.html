@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WhitelistManager — Explicación</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <div class="container">
+    <nav><a href="index.html">← Contratos</a></nav>
+    <h1>WhitelistManager.sol</h1>
+    <p class="subtitle">Gestiona la lista de participantes autorizados para una porra: entre 2 y 4 jugadores; solo ellos pueden apostar.</p>
+
+    <h2 class="section-title">Código completo del contrato</h2>
+    <div class="code-full-wrap">
+<pre class="code-full"><span class="ln"> 1</span><span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="ln"> 2</span><span class="kw">pragma</span> solidity ^0.8.19;
+
+<span class="ln"> 4</span><span class="kw">import</span> "./utils/Ownable.sol";
+
+<span class="ln"> 6</span><span class="cm">/// @title Gestión de participantes autorizados para una porra</span>
+<span class="ln"> 7</span><span class="cm">/// @notice Entre 2 y 4 jugadores; solo direcciones autorizadas pueden participar</span>
+<span class="ln"> 8</span><span class="kw">contract</span> WhitelistManager <span class="kw">is</span> Ownable {
+<span class="ln"> 9</span>    address[] <span class="kw">private</span> _participants;
+<span class="ln">10</span>    mapping(address => bool) <span class="kw">private</span> _isWhitelisted;
+<span class="ln">11</span>    uint256 <span class="kw">public</span> <span class="kw">constant</span> MIN_PARTICIPANTS = 2;
+<span class="ln">12</span>    uint256 <span class="kw">public</span> <span class="kw">constant</span> MAX_PARTICIPANTS = 4;
+
+<span class="ln">14</span>    <span class="kw">event</span> ParticipantAdded(address indexed participant);
+<span class="ln">15</span>    <span class="kw">event</span> ParticipantRemoved(address indexed participant);
+
+<span class="ln">17</span>    <span class="kw">constructor</span>(address[] memory participants) Ownable(msg.sender) {
+<span class="ln">18</span>        require(
+<span class="ln">19</span>            participants.length >= MIN_PARTICIPANTS && participants.length <= MAX_PARTICIPANTS,
+<span class="ln">20</span>            <span class="str">"WhitelistManager: invalid number of participants"</span>
+<span class="ln">21</span>        );
+<span class="ln">22</span>        <span class="kw">for</span> (uint256 i = 0; i < participants.length; i++) {
+<span class="ln">23</span>            address p = participants[i];
+<span class="ln">24</span>            require(p != address(0), <span class="str">"WhitelistManager: zero address"</span>);
+<span class="ln">25</span>            require(!_isWhitelisted[p], <span class="str">"WhitelistManager: duplicate participant"</span>);
+<span class="ln">26</span>            _isWhitelisted[p] = <span class="kw">true</span>;
+<span class="ln">27</span>            _participants.push(p);
+<span class="ln">28</span>            <span class="kw">emit</span> ParticipantAdded(p);
+<span class="ln">29</span>        }
+<span class="ln">30</span>    }
+
+<span class="ln">32</span>    <span class="kw">function</span> addParticipant(address participant) <span class="kw">external</span> onlyOwner {
+<span class="ln">33</span>        require(participant != address(0), <span class="str">"WhitelistManager: zero address"</span>);
+<span class="ln">34</span>        require(!_isWhitelisted[participant], <span class="str">"WhitelistManager: already whitelisted"</span>);
+<span class="ln">35</span>        require(_participants.length < MAX_PARTICIPANTS, <span class="str">"WhitelistManager: max participants reached"</span>);
+<span class="ln">36</span>        _isWhitelisted[participant] = <span class="kw">true</span>;
+<span class="ln">37</span>        _participants.push(participant);
+<span class="ln">38</span>        <span class="kw">emit</span> ParticipantAdded(participant);
+<span class="ln">39</span>    }
+
+<span class="ln">41</span>    <span class="kw">function</span> removeParticipant(address participant) <span class="kw">external</span> onlyOwner {
+<span class="ln">42</span>        require(_isWhitelisted[participant], <span class="str">"WhitelistManager: not whitelisted"</span>);
+<span class="ln">43</span>        _isWhitelisted[participant] = <span class="kw">false</span>;
+<span class="ln">44</span>        <span class="kw">for</span> (uint256 i = 0; i < _participants.length; i++) {
+<span class="ln">45</span>            <span class="kw">if</span> (_participants[i] == participant) {
+<span class="ln">46</span>                _participants[i] = _participants[_participants.length - 1];
+<span class="ln">47</span>                _participants.pop();
+<span class="ln">48</span>                <span class="kw">break</span>;
+<span class="ln">49</span>            }
+<span class="ln">50</span>        }
+<span class="ln">51</span>        <span class="kw">emit</span> ParticipantRemoved(participant);
+<span class="ln">52</span>    }
+
+<span class="ln">54</span>    <span class="kw">function</span> isWhitelisted(address account) <span class="kw">external</span> <span class="kw">view</span> returns (bool) {
+<span class="ln">55</span>        <span class="kw">return</span> _isWhitelisted[account];
+<span class="ln">56</span>    }
+
+<span class="ln">58</span>    <span class="kw">function</span> getParticipants() <span class="kw">external</span> <span class="kw">view</span> returns (address[] memory) {
+<span class="ln">59</span>        <span class="kw">return</span> _participants;
+<span class="ln">60</span>    }
+
+<span class="ln">62</span>    <span class="kw">function</span> participantCount() <span class="kw">external</span> <span class="kw">view</span> returns (uint256) {
+<span class="ln">63</span>        <span class="kw">return</span> _participants.length;
+<span class="ln">64</span>    }
+<span class="ln">65</span>}</pre>
+    </div>
+
+    <h2 class="section-title">Explicación detallada (cada palabra)</h2>
+
+    <div class="line-block">
+      <span class="line-num">1-4</span>
+      <span class="code-line">// SPDX-License-Identifier: MIT — pragma — import Ownable</span>
+      <div class="explain">
+        <strong>Cabecera.</strong>
+        <div class="explain-words">
+          <span class="term">// SPDX-License-Identifier: MIT</span> — Comentario de licencia (código abierto MIT).<br>
+          <span class="term">pragma solidity ^0.8.19</span> — Compilador Solidity 0.8.19 o superior.<br>
+          <span class="term">import "./utils/Ownable.sol"</span> — Trae el contrato Ownable para tener un “dueño” (owner) que pueda añadir o quitar participantes.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">8</span>
+      <span class="code-line">contract WhitelistManager is Ownable {</span>
+      <div class="explain">
+        <strong>Declaración del contrato.</strong>
+        <div class="explain-words">
+          <span class="term">contract WhitelistManager</span> — Nombre del contrato: gestor de lista blanca.<br>
+          <span class="term">is Ownable</span> — Hereda Ownable: quien despliega será el owner y podrá usar onlyOwner en addParticipant y removeParticipant.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">9</span>
+      <span class="code-line">address[] private _participants;</span>
+      <div class="explain">
+        <strong>Lista de participantes.</strong>
+        <div class="explain-words">
+          <span class="term">address[]</span> — Array dinámico de direcciones (address = 20 bytes, una dirección Ethereum).<br>
+          <span class="term">private</span> — Solo este contrato puede leer o modificar esta variable (no es accesible desde fuera directamente).<br>
+          <span class="term">_participants</span> — Nombre; el guion bajo es convención para variables internas. Guarda la lista ordenada de direcciones autorizadas.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">10</span>
+      <span class="code-line">mapping(address => bool) private _isWhitelisted;</span>
+      <div class="explain">
+        <strong>Mapa “¿está en la lista?”.</strong>
+        <div class="explain-words">
+          <span class="term">mapping</span> — Asocia a cada clave un valor (aquí: dirección → true/false).<br>
+          <span class="term">address => bool</span> — Para cada dirección (address), un booleano: true = está en la whitelist, false = no.<br>
+          <span class="term">_isWhitelisted</span> — Nombre; permite saber en O(1) si una dirección está autorizada sin recorrer el array.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">11-12</span>
+      <span class="code-line">uint256 public constant MIN_PARTICIPANTS = 2;  uint256 public constant MAX_PARTICIPANTS = 4;</span>
+      <div class="explain">
+        <strong>Límites de participantes.</strong>
+        <div class="explain-words">
+          <span class="term">uint256</span> — Entero sin signo de 256 bits.<br>
+          <span class="term">public constant</span> — Cualquiera puede leerlo (public) y el valor no cambia nunca (constant); el compilador sustituye el valor y ahorra gas.<br>
+          <span class="term">MIN_PARTICIPANTS = 2</span> — Mínimo 2 jugadores en la porra.<br>
+          <span class="term">MAX_PARTICIPANTS = 4</span> — Máximo 4 jugadores.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">14-15</span>
+      <span class="code-line">event ParticipantAdded(address indexed participant);  event ParticipantRemoved(address indexed participant);</span>
+      <div class="explain">
+        <strong>Eventos.</strong>
+        <div class="explain-words">
+          <span class="term">event</span> — Declara un evento que el contrato puede emitir y las apps pueden escuchar en los logs.<br>
+          <span class="term">ParticipantAdded(address indexed participant)</span> — Se emite cuando se añade un participante; indexed permite filtrar por participant.<br>
+          <span class="term">ParticipantRemoved(address indexed participant)</span> — Se emite cuando se quita un participante de la lista.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">17</span>
+      <span class="code-line">constructor(address[] memory participants) Ownable(msg.sender) {</span>
+      <div class="explain">
+        <strong>Constructor: firma.</strong>
+        <div class="explain-words">
+          <span class="term">constructor</span> — Se ejecuta una sola vez al desplegar el contrato.<br>
+          <span class="term">address[] memory participants</span> — Recibe un array de direcciones; memory indica que el array está en memoria (no en storage).<br>
+          <span class="term">Ownable(msg.sender)</span> — Llama al constructor del padre Ownable; msg.sender (quien despliega) se convierte en el owner.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">18-21</span>
+      <span class="code-line">require(participants.length >= MIN_PARTICIPANTS && participants.length <= MAX_PARTICIPANTS, "...");</span>
+      <div class="explain">
+        <strong>Validar número de participantes.</strong>
+        <div class="explain-words">
+          <span class="term">require(condición, "mensaje")</span> — Si la condición es false, la transacción revierte y se devuelve el mensaje (y se pierde el gas usado hasta ese punto).<br>
+          <span class="term">participants.length</span> — Número de elementos del array.<br>
+          <span class="term">>= MIN_PARTICIPANTS</span> — Al menos 2.<br>
+          <span class="term">&&</span> — Y lógico.<br>
+          <span class="term"><= MAX_PARTICIPANTS</span> — Como máximo 4.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">22-29</span>
+      <span class="code-line">for (uint256 i = 0; i < participants.length; i++) { address p = participants[i]; require(p != address(0)); require(!_isWhitelisted[p]); _isWhitelisted[p] = true; _participants.push(p); emit ParticipantAdded(p); }</span>
+      <div class="explain">
+        <strong>Bucle que añade cada participante.</strong>
+        <div class="explain-words">
+          <span class="term">for (uint256 i = 0; i < participants.length; i++)</span> — Recorre el array desde 0 hasta length-1.<br>
+          <span class="term">address p = participants[i]</span> — Guarda en p la dirección del participante en la posición i.<br>
+          <span class="term">require(p != address(0))</span> — address(0) es la dirección cero (0x0...0); no está permitida.<br>
+          <span class="term">require(!_isWhitelisted[p])</span> — Evita duplicados: si p ya estaba en la lista, revierte.<br>
+          <span class="term">_isWhitelisted[p] = true</span> — Marcamos que esta dirección está en la whitelist.<br>
+          <span class="term">_participants.push(p)</span> — Añadimos la dirección al final del array _participants.<br>
+          <span class="term">emit ParticipantAdded(p)</span> — Emitimos el evento para cada participante añadido.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">32</span>
+      <span class="code-line">function addParticipant(address participant) external onlyOwner {</span>
+      <div class="explain">
+        <strong>Función añadir participante.</strong>
+        <div class="explain-words">
+          <span class="term">function addParticipant</span> — Nombre de la función.<br>
+          <span class="term">address participant</span> — Parámetro: la dirección a añadir.<br>
+          <span class="term">external</span> — Solo puede ser llamada desde fuera del contrato (por usuarios u otros contratos).<br>
+          <span class="term">onlyOwner</span> — Modificador de Ownable: si msg.sender no es el owner, la función revierte; solo el dueño puede añadir.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">33-38</span>
+      <span class="code-line">require(participant != address(0)); require(!_isWhitelisted[participant]); require(_participants.length < MAX_PARTICIPANTS); _isWhitelisted[participant] = true; _participants.push(participant); emit ParticipantAdded(participant);</span>
+      <div class="explain">
+        <strong>Cuerpo de addParticipant.</strong>
+        <div class="explain-words">
+          <span class="term">participant != address(0)</span> — No se permite la dirección cero.<br>
+          <span class="term">!_isWhitelisted[participant]</span> — No puede estar ya en la lista (evita duplicados).<br>
+          <span class="term">_participants.length < MAX_PARTICIPANTS</span> — No puede haber ya 4 participantes (máximo 4).<br>
+          Luego se marca como whitelisted, se hace push al array y se emite ParticipantAdded.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">41</span>
+      <span class="code-line">function removeParticipant(address participant) external onlyOwner {</span>
+      <div class="explain">
+        <strong>Función quitar participante.</strong>
+        <div class="explain-words">
+          <span class="term">removeParticipant(address participant)</span> — Recibe la dirección a quitar.<br>
+          <span class="term">onlyOwner</span> — Solo el owner puede quitar participantes.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">42-51</span>
+      <span class="code-line">require(_isWhitelisted[participant]); _isWhitelisted[participant] = false; for ... _participants[i] = _participants[_participants.length - 1]; _participants.pop(); break; emit ParticipantRemoved;</span>
+      <div class="explain">
+        <strong>Cuerpo de removeParticipant.</strong>
+        <div class="explain-words">
+          <span class="term">require(_isWhitelisted[participant])</span> — Debe estar en la lista para poder quitarlo.<br>
+          <span class="term">_isWhitelisted[participant] = false</span> — Lo quitamos del mapa (ya no está autorizado).<br>
+          <span class="term">for ... if (_participants[i] == participant)</span> — Buscamos su posición en el array.<br>
+          <span class="term">_participants[i] = _participants[_participants.length - 1]</span> — Sustituimos el elemento a quitar por el último del array (truco para borrar en O(1) sin dejar huecos).<br>
+          <span class="term">_participants.pop()</span> — Eliminamos el último elemento (que ahora está duplicado); el array se acorta en 1.<br>
+          <span class="term">break</span> — Salimos del for porque ya encontramos y eliminamos.<br>
+          <span class="term">emit ParticipantRemoved(participant)</span> — Notificamos que se quitó a ese participante.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">54-56</span>
+      <span class="code-line">function isWhitelisted(address account) external view returns (bool) { return _isWhitelisted[account]; }</span>
+      <div class="explain">
+        <strong>Consultar si una dirección está en la lista.</strong>
+        <div class="explain-words">
+          <span class="term">isWhitelisted(address account)</span> — Recibe una dirección y devuelve si puede participar.<br>
+          <span class="term">external view</span> — Llamable desde fuera y solo lectura (no modifica estado).<br>
+          <span class="term">returns (bool)</span> — Devuelve true o false.<br>
+          <span class="term">return _isWhitelisted[account]</span> — PorraGame usa esta función para comprobar si msg.sender puede apostar.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">58-60</span>
+      <span class="code-line">function getParticipants() external view returns (address[] memory) { return _participants; }</span>
+      <div class="explain">
+        <strong>Obtener la lista completa.</strong>
+        <div class="explain-words">
+          <span class="term">getParticipants()</span> — Devuelve el array de direcciones autorizadas.<br>
+          <span class="term">returns (address[] memory)</span> — Un array de direcciones en memoria (copia para quien llama).<br>
+          <span class="term">return _participants</span> — Devuelve la lista completa; la app puede mostrarla en la UI.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">62-64</span>
+      <span class="code-line">function participantCount() external view returns (uint256) { return _participants.length; }</span>
+      <div class="explain">
+        <strong>Número de participantes.</strong>
+        <div class="explain-words">
+          <span class="term">participantCount()</span> — Nombre de la función.<br>
+          <span class="term">returns (uint256)</span> — Devuelve un entero.<br>
+          <span class="term">return _participants.length</span> — Número de elementos del array = cuántos participantes hay (entre 2 y 4).
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PorraFactory — Explicación</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <div class="container">
+    <nav><a href="index.html">← Contratos</a></nav>
+    <h1>PorraFactory.sol</h1>
+    <p class="subtitle">Fábrica que crea porras: despliega WhitelistManager + PorraGame y los registra.</p>
+
+    <h2 class="section-title">Código completo del contrato</h2>
+    <div class="code-full-wrap">
+<pre class="code-full"><span class="ln"> 1</span><span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="ln"> 2</span><span class="kw">pragma</span> solidity ^0.8.19;
+
+<span class="ln"> 4</span><span class="kw">import</span> "./PorraGame.sol";
+<span class="ln"> 5</span><span class="kw">import</span> "./WhitelistManager.sol";
+<span class="ln"> 6</span><span class="kw">import</span> "./utils/Ownable.sol";
+
+<span class="ln"> 8</span><span class="cm">/// @title Factory para crear porras</span>
+<span class="ln"> 9</span><span class="cm">/// @notice Despliega WhitelistManager + PorraGame y registra la porra</span>
+<span class="ln">10</span><span class="kw">contract</span> PorraFactory <span class="kw">is</span> Ownable {
+<span class="ln">11</span>    address <span class="kw">public</span> oracle;
+<span class="ln">12</span>    PorraGame[] <span class="kw">public</span> porras;
+<span class="ln">13</span>    mapping(address => address[]) <span class="kw">public</span> porrasByCreator;
+
+<span class="ln">15</span>    <span class="kw">event</span> PorraCreated(
+<span class="ln">16</span>        address indexed game,
+<span class="ln">17</span>        address indexed whitelistManager,
+<span class="ln">18</span>        address indexed creator,
+<span class="ln">19</span>        bytes32 matchId,
+<span class="ln">20</span>        uint256 bettingDeadline
+<span class="ln">21</span>    );
+
+<span class="ln">23</span>    <span class="kw">constructor</span>(address _oracle) Ownable(msg.sender) {
+<span class="ln">24</span>        require(_oracle != address(0), <span class="str">"PorraFactory: zero oracle"</span>);
+<span class="ln">25</span>        oracle = _oracle;
+<span class="ln">26</span>    }
+
+<span class="ln">28</span>    <span class="kw">function</span> createPorra(
+<span class="ln">29</span>        address[] calldata participants,
+<span class="ln">30</span>        bytes32 matchId,
+<span class="ln">31</span>        uint256 bettingDeadline,
+<span class="ln">32</span>        uint256 matchEndTime,
+<span class="ln">33</span>        uint256 stakeAmount
+<span class="ln">34</span>    ) <span class="kw">external</span> returns (address game, address whitelistManagerAddr) {
+<span class="ln">35</span>        WhitelistManager wl = <span class="kw">new</span> WhitelistManager(participants);
+<span class="ln">36</span>        whitelistManagerAddr = address(wl);
+
+<span class="ln">38</span>        PorraGame g = <span class="kw">new</span> PorraGame(
+<span class="ln">39</span>            whitelistManagerAddr,
+<span class="ln">40</span>            oracle,
+<span class="ln">41</span>            matchId,
+<span class="ln">42</span>            bettingDeadline,
+<span class="ln">43</span>            matchEndTime,
+<span class="ln">44</span>            stakeAmount
+<span class="ln">45</span>        );
+<span class="ln">46</span>        game = address(g);
+
+<span class="ln">48</span>        porras.push(g);
+<span class="ln">49</span>        porrasByCreator[msg.sender].push(game);
+
+<span class="ln">51</span>        <span class="kw">emit</span> PorraCreated(game, whitelistManagerAddr, msg.sender, matchId, bettingDeadline);
+<span class="ln">52</span>        <span class="kw">return</span> (game, whitelistManagerAddr);
+<span class="ln">53</span>    }
+
+<span class="ln">55</span>    <span class="kw">function</span> getPorrasCount() <span class="kw">external</span> <span class="kw">view</span> returns (uint256) {
+<span class="ln">56</span>        <span class="kw">return</span> porras.length;
+<span class="ln">57</span>    }
+
+<span class="ln">59</span>    <span class="kw">function</span> getPorraAt(uint256 index) <span class="kw">external</span> <span class="kw">view</span> returns (address) {
+<span class="ln">60</span>        require(index < porras.length, <span class="str">"PorraFactory: index out of bounds"</span>);
+<span class="ln">61</span>        <span class="kw">return</span> address(porras[index]);
+<span class="ln">62</span>    }
+
+<span class="ln">64</span>    <span class="kw">function</span> getPorrasByCreator(address creator) <span class="kw">external</span> <span class="kw">view</span> returns (address[] memory) {
+<span class="ln">65</span>        <span class="kw">return</span> porrasByCreator[creator];
+<span class="ln">66</span>    }
+
+<span class="ln">68</span>    <span class="kw">function</span> setOracle(address _oracle) <span class="kw">external</span> onlyOwner {
+<span class="ln">69</span>        require(_oracle != address(0), <span class="str">"PorraFactory: zero oracle"</span>);
+<span class="ln">70</span>        oracle = _oracle;
+<span class="ln">71</span>    }
+<span class="ln">72</span>}</pre>
+    </div>
+
+    <h2 class="section-title">Explicación detallada (cada palabra)</h2>
+
+    <div class="line-block">
+      <span class="line-num">1-2</span>
+      <span class="code-line">// SPDX-License-Identifier: MIT — pragma solidity ^0.8.19;</span>
+      <div class="explain">
+        <strong>Licencia y versión.</strong>
+        <div class="explain-words">
+          <span class="term">// SPDX-License-Identifier: MIT</span> — Comentario que indica licencia MIT.<br>
+          <span class="term">pragma solidity ^0.8.19</span> — El código se compila con Solidity 0.8.19 o superior (^ = compatible con parches).
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">4-6</span>
+      <span class="code-line">import PorraGame, WhitelistManager, Ownable</span>
+      <div class="explain">
+        <strong>Imports.</strong>
+        <div class="explain-words">
+          <span class="term">import "./PorraGame.sol"</span> — Necesitamos el contrato PorraGame para poder crear instancias con new PorraGame(...).<br>
+          <span class="term">import "./WhitelistManager.sol"</span> — Para crear un WhitelistManager por cada porra.<br>
+          <span class="term">import "./utils/Ownable.sol"</span> — Para que la factory tenga “dueño” (owner) y solo él pueda setOracle.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">10</span>
+      <span class="code-line">contract PorraFactory is Ownable {</span>
+      <div class="explain">
+        <strong>Contrato fábrica.</strong>
+        <div class="explain-words">
+          <span class="term">contract</span> — Declara un contrato.<br>
+          <span class="term">PorraFactory</span> — Nombre.<br>
+          <span class="term">is Ownable</span> — Hereda Ownable: tendrá owner y modificador onlyOwner.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">11</span>
+      <span class="code-line">address public oracle;</span>
+      <div class="explain">
+        <strong>Dirección del oráculo.</strong>
+        <div class="explain-words">
+          <span class="term">address</span> — Tipo: una dirección de Ethereum (20 bytes).<br>
+          <span class="term">public</span> — Cualquiera puede leerla; el compilador genera automáticamente una función oracle().<br>
+          <span class="term">oracle</span> — Nombre: guarda la dirección del contrato oráculo que usarán todas las porras creadas.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">12</span>
+      <span class="code-line">PorraGame[] public porras;</span>
+      <div class="explain">
+        <strong>Lista de todas las porras.</strong>
+        <div class="explain-words">
+          <span class="term">PorraGame[]</span> — Array dinámico de contratos tipo PorraGame.<br>
+          <span class="term">public porras</span> — Lista accesible desde fuera; porras(0), porras(1), etc. devuelven cada juego.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">13</span>
+      <span class="code-line">mapping(address => address[]) public porrasByCreator;</span>
+      <div class="explain">
+        <strong>Porras agrupadas por creador.</strong>
+        <div class="explain-words">
+          <span class="term">mapping(address => address[])</span> — Para cada dirección (creador), un array de direcciones (sus porras).<br>
+          <span class="term">porrasByCreator</span> — Nombre; porrasByCreator(unaDireccion) devuelve la lista de porras que creó esa dirección.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">15-21</span>
+      <span class="code-line">event PorraCreated(address indexed game, ...);</span>
+      <div class="explain">
+        <strong>Evento al crear una porra.</strong>
+        <div class="explain-words">
+          <span class="term">event PorraCreated</span> — Nombre del evento.<br>
+          <span class="term">address indexed game</span> — Dirección del contrato PorraGame creado; indexed permite filtrar por “game” en logs.<br>
+          <span class="term">address indexed whitelistManager</span> — Dirección del WhitelistManager de esa porra.<br>
+          <span class="term">address indexed creator</span> — Quien llamó a createPorra (msg.sender).<br>
+          <span class="term">bytes32 matchId</span> — Identificador del partido (no indexed).<br>
+          <span class="term">uint256 bettingDeadline</span> — Fecha límite de apuestas (timestamp).
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">23-26</span>
+      <span class="code-line">constructor(address _oracle) Ownable(msg.sender) { require(...); oracle = _oracle; }</span>
+      <div class="explain">
+        <strong>Constructor.</strong>
+        <div class="explain-words">
+          <span class="term">constructor(address _oracle)</span> — Al desplegar hay que pasar la dirección del oráculo (_oracle).<br>
+          <span class="term">Ownable(msg.sender)</span> — El que despliega (msg.sender) se registra como owner en Ownable.<br>
+          <span class="term">require(_oracle != address(0), "...")</span> — address(0) es la dirección cero; no está permitida (oráculo inválido).<br>
+          <span class="term">oracle = _oracle</span> — Guarda la dirección del oráculo en la variable de estado.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">28-34</span>
+      <span class="code-line">function createPorra(address[] calldata participants, bytes32 matchId, ...) external returns (address game, address whitelistManagerAddr)</span>
+      <div class="explain">
+        <strong>Firma de createPorra.</strong>
+        <div class="explain-words">
+          <span class="term">function createPorra</span> — Nombre de la función.<br>
+          <span class="term">address[] calldata participants</span> — Array de direcciones (los jugadores autorizados); calldata = se lee desde los datos de la llamada (más barato en gas).<br>
+          <span class="term">bytes32 matchId</span> — ID del partido.<br>
+          <span class="term">uint256 bettingDeadline</span> — Timestamp hasta cuando se puede apostar.<br>
+          <span class="term">uint256 matchEndTime</span> — Timestamp de fin del partido (para poder resolver después).<br>
+          <span class="term">uint256 stakeAmount</span> — Cantidad en wei que debe apostar cada jugador.<br>
+          <span class="term">external</span> — Llamable desde fuera.<br>
+          <span class="term">returns (address game, address whitelistManagerAddr)</span> — Devuelve las direcciones del juego y del whitelist creados.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">35-36</span>
+      <span class="code-line">WhitelistManager wl = new WhitelistManager(participants); whitelistManagerAddr = address(wl);</span>
+      <div class="explain">
+        <strong>Crear el WhitelistManager.</strong>
+        <div class="explain-words">
+          <span class="term">new WhitelistManager(participants)</span> — Despliega un nuevo contrato WhitelistManager en la blockchain, pasando la lista de participantes al constructor.<br>
+          <span class="term">wl</span> — Variable que referencia ese contrato.<br>
+          <span class="term">address(wl)</span> — Convierte la referencia a tipo address (la dirección del contrato).<br>
+          <span class="term">whitelistManagerAddr = ...</span> — Guardamos esa dirección para pasarla al PorraGame y devolverla.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">38-46</span>
+      <span class="code-line">PorraGame g = new PorraGame(whitelistManagerAddr, oracle, matchId, ...); game = address(g);</span>
+      <div class="explain">
+        <strong>Crear el PorraGame.</strong>
+        <div class="explain-words">
+          <span class="term">new PorraGame(...)</span> — Despliega un nuevo contrato PorraGame con esos parámetros: whitelist, oráculo, matchId, bettingDeadline, matchEndTime, stakeAmount.<br>
+          <span class="term">g</span> — Referencia al contrato creado.<br>
+          <span class="term">game = address(g)</span> — La dirección del juego se guarda en la variable de retorno game.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">48-49</span>
+      <span class="code-line">porras.push(g); porrasByCreator[msg.sender].push(game);</span>
+      <div class="explain">
+        <strong>Registrar la porra.</strong>
+        <div class="explain-words">
+          <span class="term">porras.push(g)</span> — Añade el nuevo PorraGame al array global de porras.<br>
+          <span class="term">porrasByCreator[msg.sender]</span> — Accede al array de porras del creador (msg.sender es quien llamó createPorra).<br>
+          <span class="term">.push(game)</span> — Añade la dirección del juego a la lista de ese creador.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">51-52</span>
+      <span class="code-line">emit PorraCreated(...); return (game, whitelistManagerAddr);</span>
+      <div class="explain">
+        <strong>Notificar y devolver.</strong>
+        <div class="explain-words">
+          <span class="term">emit PorraCreated(game, whitelistManagerAddr, msg.sender, matchId, bettingDeadline)</span> — Emite el evento con todos los datos para que la app/frontend pueda detectar la nueva porra.<br>
+          <span class="term">return (game, whitelistManagerAddr)</span> — Devuelve las dos direcciones al que llamó la función.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">55-57</span>
+      <span class="code-line">function getPorrasCount() external view returns (uint256) { return porras.length; }</span>
+      <div class="explain">
+        <strong>Número total de porras.</strong>
+        <div class="explain-words">
+          <span class="term">getPorrasCount</span> — Nombre de la función.<br>
+          <span class="term">external view</span> — Llamable desde fuera y solo lectura (no modifica estado).<br>
+          <span class="term">returns (uint256)</span> — Devuelve un número entero.<br>
+          <span class="term">porras.length</span> — Longitud del array porras = cuántas porras se han creado.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">59-62</span>
+      <span class="code-line">function getPorraAt(uint256 index) ... require(index < porras.length); return address(porras[index]);</span>
+      <div class="explain">
+        <strong>Obtener una porra por índice.</strong>
+        <div class="explain-words">
+          <span class="term">getPorraAt(uint256 index)</span> — Recibe la posición en el array (0, 1, 2...).<br>
+          <span class="term">require(index < porras.length, "...")</span> — Si el índice es >= length, revierte con mensaje "index out of bounds".<br>
+          <span class="term">return address(porras[index])</span> — Convierte el elemento del array (un PorraGame) a address y lo devuelve.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">64-66</span>
+      <span class="code-line">function getPorrasByCreator(address creator) external view returns (address[] memory)</span>
+      <div class="explain">
+        <strong>Porras creadas por una dirección.</strong>
+        <div class="explain-words">
+          <span class="term">getPorrasByCreator(address creator)</span> — Recibe la dirección del creador.<br>
+          <span class="term">returns (address[] memory)</span> — Devuelve un array de direcciones en memoria (las porras que creó).<br>
+          <span class="term">return porrasByCreator[creator]</span> — Devuelve el array asociado a esa dirección en el mapping.
+        </div>
+      </div>
+    </div>
+
+    <div class="line-block">
+      <span class="line-num">68-71</span>
+      <span class="code-line">function setOracle(address _oracle) external onlyOwner { require(...); oracle = _oracle; }</span>
+      <div class="explain">
+        <strong>Cambiar el oráculo (solo owner).</strong>
+        <div class="explain-words">
+          <span class="term">setOracle(address _oracle)</span> — Nueva dirección del oráculo.<br>
+          <span class="term">onlyOwner</span> — Modificador de Ownable: si msg.sender no es el owner, la función revierte.<br>
+          <span class="term">require(_oracle != address(0), "...")</span> — No se permite la dirección cero.<br>
+          <span class="term">oracle = _oracle</span> — Actualiza la variable; las próximas porras creadas usarán este oráculo.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
