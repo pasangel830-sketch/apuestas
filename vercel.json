@@ -2,9 +2,6 @@
   "installCommand": "cp -r frontend/api api && npm install --prefix api --legacy-peer-deps && npm install --prefix frontend --legacy-peer-deps",
   "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "api/oracle/fulfill.mjs": { "maxDuration": 60 }
-  },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
