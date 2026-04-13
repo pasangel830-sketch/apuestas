@@ -1,7 +1,7 @@
 node_modules/
 
-# Copia efímera en build Vercel (vercel.json raíz); fuente: frontend/api
-/api/
+# No ignorar /api/ en la raíz: Vercel no empaqueta carpetas .gitignore; installCommand copia
+# frontend/api → api/ y sin eso /api/* devuelve 404. No subas api/ manualmente al repo.
 
 # Compiler files
 cache/

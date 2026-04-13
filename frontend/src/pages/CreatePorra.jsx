@@ -571,8 +571,7 @@ function CreatePorra() {
           <p className="hint">Cargando partidos desde la base de datos…</p>
         ) : savedMatchesError ? (
           <div className="error-box" role="alert">
-            <strong>No se pudieron cargar los partidos:</strong> {savedMatchesError}. Arranca PostgreSQL y{' '}
-            <code>npm run dev</code> en <code>frontend/</code> (oracle-api con <code>DATABASE_URL</code>).
+            <strong>No se pudieron cargar los partidos:</strong> {savedMatchesError}
           </div>
         ) : savedMatches.length > 0 ? (
           <label>
