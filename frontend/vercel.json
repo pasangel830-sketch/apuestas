@@ -6,8 +6,5 @@
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ],
-  "functions": {
-    "api/oracle/fulfill.mjs": { "maxDuration": 60 }
-  }
+  ]
 }
