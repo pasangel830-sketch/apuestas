@@ -1,6 +1,6 @@
 /**
  * Dev local: mismo comportamiento que las Vercel Functions en api/*.mjs (pool por request).
- * Producción Vercel: despliega frontend/; las rutas /api/* las sirven los archivos en api/.
+ * Producción Vercel: raíz del repo tiene /api (serverless); mismo código que aquí.
  */
 import 'dotenv/config';
 import express from 'express';

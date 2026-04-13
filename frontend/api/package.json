@@ -1,0 +1,9 @@
+{
+  "name": "buddybets-vercel-api",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "pg": "^8.20.0",
+    "viem": "^2.47.1"
+  }
+}

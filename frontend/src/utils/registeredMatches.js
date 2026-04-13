@@ -1,8 +1,19 @@
-import { oracleApiUrl } from './oracleApi';
+import { oracleApiUrl, oracleApiBase } from './oracleApi';
 
 /** @typedef {{ id: string, label: string }} RegisteredMatch */
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
+
+/** @param {Response | { json?: () => Promise<unknown>, text?: () => Promise<string>, clone?: () => unknown }} r */
+async function responseBodyText(r) {
+  if (typeof r.clone === 'function') {
+    const c = r.clone();
+    if (c && typeof c.text === 'function') return c.text();
+  }
+  if (typeof r.text === 'function') return r.text();
+  if (typeof r.json === 'function') return r.json().then((o) => JSON.stringify(o));
+  return '';
+}
 
 /**
  * @returns {Promise<RegisteredMatch[]>}
@@ -20,8 +31,52 @@ function matchesApiError(status, j, statusText) {
 }
 
 export async function fetchRegisteredMatches() {
-  const r = await fetch(oracleApiUrl('/api/sports/matches'));
-  const j = await r.json().catch(() => ({}));
+  const url = oracleApiUrl('/api/sports/matches');
+  // #region agent log
+  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'c2a728' },
+    body: JSON.stringify({
+      sessionId: 'c2a728',
+      runId: 'pre-fix',
+      hypothesisId: 'H2',
+      location: 'registeredMatches.js:fetchRegisteredMatches:pre',
+      message: 'GET /api/sports/matches',
+      data: { url, apiBase: oracleApiBase() || '(same-origin)' },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+  const r = await fetch(url);
+  const rawText = await responseBodyText(r);
+  let j = {};
+  try {
+    j = JSON.parse(rawText);
+  } catch {
+    j = { __parseError: true };
+  }
+  // #region agent log
+  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'c2a728' },
+    body: JSON.stringify({
+      sessionId: 'c2a728',
+      runId: 'pre-fix',
+      hypothesisId: 'H1',
+      location: 'registeredMatches.js:fetchRegisteredMatches:post',
+      message: 'GET response',
+      data: {
+        status: r.status,
+        ok: r.ok,
+        contentType: r.headers?.get?.('content-type'),
+        bodySnippet: rawText.slice(0, 320),
+        looksLikeHtml: rawText.trimStart().startsWith('<'),
+        jError: typeof j.error === 'string' ? j.error : undefined,
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
   if (!r.ok) {
     throw new Error(matchesApiError(r.status, j, r.statusText));
   }
@@ -38,7 +93,23 @@ export async function addRegisteredMatch(id, label = '') {
   if (!trimmed) {
     return { ok: false, error: 'El identificador no puede estar vacío.' };
   }
-  const r = await fetch(oracleApiUrl('/api/sports/matches'), {
+  const url = oracleApiUrl('/api/sports/matches');
+  // #region agent log
+  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'c2a728' },
+    body: JSON.stringify({
+      sessionId: 'c2a728',
+      runId: 'pre-fix',
+      hypothesisId: 'H2',
+      location: 'registeredMatches.js:addRegisteredMatch:pre',
+      message: 'POST /api/sports/matches',
+      data: { url, apiBase: oracleApiBase() || '(same-origin)', idLen: trimmed.length },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+  const r = await fetch(url, {
     method: 'POST',
     headers: JSON_HEADERS,
     body: JSON.stringify({
@@ -46,7 +117,35 @@ export async function addRegisteredMatch(id, label = '') {
       label: typeof label === 'string' ? label.trim() : '',
     }),
   });
-  const j = await r.json().catch(() => ({}));
+  const rawText = await responseBodyText(r);
+  let j = {};
+  try {
+    j = JSON.parse(rawText);
+  } catch {
+    j = { __parseError: true };
+  }
+  // #region agent log
+  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'c2a728' },
+    body: JSON.stringify({
+      sessionId: 'c2a728',
+      runId: 'pre-fix',
+      hypothesisId: 'H1',
+      location: 'registeredMatches.js:addRegisteredMatch:post',
+      message: 'POST response',
+      data: {
+        status: r.status,
+        ok: r.ok,
+        contentType: r.headers?.get?.('content-type'),
+        bodySnippet: rawText.slice(0, 320),
+        looksLikeHtml: rawText.trimStart().startsWith('<'),
+        jError: typeof j.error === 'string' ? j.error : undefined,
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
   if (r.status === 409) {
     return { ok: false, error: j.error || 'Ya existe un partido con ese identificador.' };
   }

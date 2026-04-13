@@ -1,3 +1,8 @@
+node_modules/
+
+# Copia efímera en build Vercel (vercel.json raíz); fuente: frontend/api
+/api/
+
 # Compiler files
 cache/
 out/
