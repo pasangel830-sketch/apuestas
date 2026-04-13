@@ -1,5 +1,5 @@
 {
-  "installCommand": "cp -r frontend/api api && npm install --prefix api --legacy-peer-deps && npm install --prefix frontend --legacy-peer-deps",
+  "installCommand": "if [ -d frontend/api ]; then rm -rf api && cp -r frontend/api api; fi && npm install --prefix api --legacy-peer-deps && if [ -f frontend/package.json ]; then npm install --prefix frontend --legacy-peer-deps; else npm install --legacy-peer-deps; fi",
   "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
   "rewrites": [
