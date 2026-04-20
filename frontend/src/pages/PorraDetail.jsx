@@ -298,6 +298,7 @@ function PorraDetail() {
       address: gameAddress,
       abi: PorraGameAbi,
       functionName: 'startResolution',
+      gas: 200_000n,
     });
   };
 
@@ -307,6 +308,7 @@ function PorraDetail() {
       address: gameAddress,
       abi: PorraGameAbi,
       functionName: 'resolveWithOracle',
+      gas: 150_000n,
     });
   };
 
@@ -316,6 +318,7 @@ function PorraDetail() {
       address: gameAddress,
       abi: PorraGameAbi,
       functionName: 'claimReward',
+      gas: 100_000n,
     });
   };
 
