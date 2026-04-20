@@ -22,6 +22,15 @@ docs/
 
 # Cursor / IDE local
 .cursor/
+.vercel
+
+# Debug logs (local)
+debug-*.log
+debug-*.ndjson
 
 # API deportiva mock (resultados publicados)
 frontend/server/data/sports-results.json
+
+# Foundry / Vercel deploy artifacts
+broadcast/**/run-*.json
+broadcast/**/run-latest.json
