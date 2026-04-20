@@ -199,7 +199,7 @@ cast send ORACLE_ADDRESS "setResult(bytes32,uint8)" $(cast keccak "atleti-vs-riv
 
 ## Despliegue en la web (producción)
 
-Orden recomendado: **1) contratos en Sepolia** (obtienes direcciones) → **2) oracle-api en Railway** (Postgres + fulfill on-chain) → **3) frontend en Vercel** (variables con las direcciones y la URL de la API).
+Orden recomendado: **1) contratos en Sepolia** (obtienes direcciones) → **2) Vercel (frontend + /api serverless)** (Postgres en Neon + endpoints).
 
 ### 1. Contratos (Sepolia)
 
@@ -209,37 +209,23 @@ Variables típicas: `PRIVATE_KEY` (o pasar `--private-key`), `SEPOLIA_RPC_URL` (
 forge script script/Deploy.s.sol --rpc-url $env:SEPOLIA_RPC_URL --broadcast --private-key $env:PRIVATE_KEY
 ```
 
-(Anota `MockOracle` y `PorraFactory` de la salida. El desplegador es **owner** de `MockOracle`: esa misma clave debe usarse como `ORACLE_PRIVATE_KEY` en Railway para `setResult`.)
+(Anota `MockOracle` y `PorraFactory` de la salida. El desplegador es **owner** de `MockOracle`: esa misma clave debe usarse como `ORACLE_PRIVATE_KEY` si vas a exponer endpoints que firmen transacciones.)
 
 La cuenta del oráculo necesita **ETH de Sepolia** para pagar el gas de las transacciones que firma la API (`/api/oracle/fulfill`).
 
-### 2. Oracle API (Railway)
-
-- Crea un servicio **PostgreSQL** en Railway y copia su `DATABASE_URL`.
-- Crea un servicio desde el mismo repo: **Root Directory** `frontend`, **Start Command** `node server/oracle-api.mjs`, **Install** `npm install` (por defecto).
-- Variables de entorno:
-  - `DATABASE_URL` — conexión Postgres (Railway la inyecta si vinculas la DB al servicio).
-  - `ORACLE_ADDRESS` — dirección del `MockOracle` en Sepolia.
-  - `ORACLE_PRIVATE_KEY` — misma clave que desplegó el contrato (owner).
-  - `ORACLE_RPC_URL` — RPC HTTPS de Sepolia (p. ej. Infura/Alchemy).
-  - `ORACLE_CHAIN_ID` = `11155111` (Sepolia; por defecto en código es `31337` solo para local).
-- Railway asigna `PORT`: el servidor ya lo usa. CORS está abierto (`origin: true`) para que el frontend en otro dominio pueda llamar a la API.
-
-Tras el despliegue, copia la URL pública del servicio (p. ej. `https://….up.railway.app`).
-
-### 3. Frontend (Vercel)
+### 2. Deploy en Vercel (frontend + /api serverless)
 
 1. **New Project** → importar el repo.
-2. **Root Directory:** `frontend`.
-3. **Build Command:** `npm run build`.
-4. **Output Directory:** `dist`.
-5. Variables:
+2. **Root Directory:** (raíz del repo).
+3. **Build Command:** usa `vercel.json` (construye `frontend`).
+4. **Output Directory:** usa `vercel.json` (`frontend/dist`).
+5. Variables (Project Settings → Environment Variables):
+   - `DATABASE_URL` — conexión Postgres (Neon).
    - `VITE_FACTORY_ADDRESS` — `PorraFactory` en Sepolia.
    - `VITE_ORACLE_ADDRESS` — `MockOracle` en Sepolia.
-   - `VITE_ORACLE_API_URL` — URL pública del oracle-api en Railway (sin barra final). Sin esto, las peticiones a `/api/...` irían al dominio de Vercel y fallarían.
-6. No actives `VITE_USE_LOCAL_CHAIN` en producción (la app usará Sepolia/mainnet según `config.js`).
+   - `ORACLE_ADDRESS`, `ORACLE_PRIVATE_KEY`, `ORACLE_RPC_URL`, `ORACLE_CHAIN_ID` — si vas a usar endpoints que escriben en cadena.
 
-El `vercel.json` en `frontend/` redirige las rutas a `index.html` para React Router.
+El frontend llama siempre a rutas relativas `/api/...` (mismo origen en Vercel).
 
 Para producción real querrías sustituir `MockOracle` por un oráculo tipo Chainlink enlazado a una API de resultados.
 
@@ -274,3 +260,21 @@ VITE_SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/TU_API_KEY
 
 Para obtener una API key gratuita: https://dashboard.alchemy.com
 (El endpoint `demo` de Alchemy funciona para pruebas pero tiene límites)
+
+## Desarrollo local con Vercel
+
+Recomendado (sirve frontend + funciones serverless):
+
+```bash
+npm i -g vercel
+vercel dev
+```
+
+Comprobaciones rápidas:
+
+```bash
+curl -i http://127.0.0.1:3000/api/health
+curl -i http://127.0.0.1:3000/api/sports/matches
+curl -i -X POST http://127.0.0.1:3000/api/sports/matches -H "Content-Type: application/json" -d "{\"id\":\"match-1\",\"label\":\"Test\"}"
+curl -i -X DELETE http://127.0.0.1:3000/api/sports/matches -H "Content-Type: application/json" -d "{\"id\":\"match-1\"}"
+```

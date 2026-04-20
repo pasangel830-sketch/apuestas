@@ -5,6 +5,10 @@
   "installCommand": "npm install --prefix frontend --legacy-peer-deps && npm install --prefix api --legacy-peer-deps",
   "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/**/*.js": { "runtime": "nodejs20.x" },
+    "api/**/*.mjs": { "runtime": "nodejs20.x" }
+  },
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/:path*", "destination": "/index.html" }

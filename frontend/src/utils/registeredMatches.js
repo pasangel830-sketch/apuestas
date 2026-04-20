@@ -1,4 +1,4 @@
-import { oracleApiUrl, oracleApiBase } from './oracleApi';
+import { oracleApiUrl } from './oracleApi';
 
 /** @typedef {{ id: string, label: string }} RegisteredMatch */
 
@@ -47,9 +47,7 @@ function matchesApiError(status, j, statusText, rawText = '') {
     }
     if (!local) {
       return (
-        'No se encuentra la API de partidos (404). En Vercel: raíz del proyecto con vercel.json (installCommand que copia frontend/api → api/), ' +
-        'no ignores la carpeta api/ en .gitignore, y define DATABASE_URL. /api/health debe devolver JSON con store "postgresql". ' +
-        'Si usas VITE_ORACLE_API_URL, la base debe ser el backend que expone /api/sports/matches.'
+        'No se encuentra la API de partidos (404). En Vercel: despliega desde la raíz del repo, define DATABASE_URL y verifica GET /api/health (debe devolver JSON).'
       );
     }
     return j.error || statusText || 'Ruta de partidos no encontrada (404).';
@@ -62,30 +60,6 @@ function matchesApiError(status, j, statusText, rawText = '') {
  */
 export async function fetchRegisteredMatches() {
   const url = oracleApiUrl('/api/sports/matches');
-  const viteOracle =
-    typeof import.meta.env.VITE_ORACLE_API_URL === 'string'
-      ? String(import.meta.env.VITE_ORACLE_API_URL).trim() || '(empty-string)'
-      : '(undefined)';
-  // #region agent log
-  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '8f1e6c' },
-    body: JSON.stringify({
-      sessionId: '8f1e6c',
-      runId: 'pre',
-      hypothesisId: 'H1-H2',
-      location: 'registeredMatches.js:fetchRegisteredMatches:pre',
-      message: 'before GET /api/sports/matches',
-      data: {
-        matchesUrl: url,
-        oracleApiBase: oracleApiBase() || '(same-origin)',
-        viteOracleApiUrl: viteOracle,
-        pageHost: typeof globalThis.location?.hostname === 'string' ? globalThis.location.hostname : '(no-window)',
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
   const r = await fetch(url);
   const rawText = await responseBodyText(r);
   let j = {};
@@ -108,29 +82,6 @@ export async function fetchRegisteredMatches() {
     } catch (e) {
       healthProbe = { error: e instanceof Error ? e.message : String(e) };
     }
-    // #region agent log
-    fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '8f1e6c' },
-      body: JSON.stringify({
-        sessionId: '8f1e6c',
-        runId: 'pre',
-        hypothesisId: 'H3-H5',
-        location: 'registeredMatches.js:fetchRegisteredMatches:error',
-        message: 'GET matches failed; probed /api/health',
-        data: {
-          matchesStatus: r.status,
-          matchesResponseUrl: r.url,
-          matchesRedirected: r.redirected,
-          contentType: r.headers.get('content-type'),
-          bodyStart: rawText.slice(0, 200),
-          looksLikeHtml: looksLikeHtmlBody(rawText),
-          healthProbe,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     throw new Error(matchesApiError(r.status, j, r.statusText, rawText));
   }
   return Array.isArray(j.matches) ? j.matches : [];
