@@ -3,6 +3,17 @@ import { injected } from 'wagmi/connectors';
 import { mainnet, sepolia } from 'wagmi/chains';
 
 const isLocal = import.meta.env.DEV && import.meta.env.VITE_USE_LOCAL_CHAIN === 'true';
+const sepoliaRpcUrl = import.meta.env.VITE_SEPOLIA_RPC_URL;
+const mainnetRpcUrl = import.meta.env.VITE_MAINNET_RPC_URL || import.meta.env.VITE_SEPOLIA_RPC_URL;
+
+if (!isLocal && import.meta.env.DEV && !sepoliaRpcUrl) {
+  console.warn(
+    '⚠️  VITE_SEPOLIA_RPC_URL no está definida. ' +
+      'El cliente RPC usará el endpoint público por defecto, ' +
+      'que puede fallar por CORS o rate limiting. ' +
+      'Añade la variable en frontend/.env.local'
+  );
+}
 
 export const chains = isLocal
   ? [
@@ -30,8 +41,8 @@ export const config = createConfig({
     ...(isLocal
       ? { 31337: http('http://127.0.0.1:8545') }
       : {
-          [sepolia.id]: http(),
-          [mainnet.id]: http(),
+          [sepolia.id]: http(sepoliaRpcUrl),
+          [mainnet.id]: http(mainnetRpcUrl),
         }),
   },
 });

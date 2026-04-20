@@ -265,3 +265,12 @@ forge test
 ```
 
 Cobertura de flujos: whitelist, apuestas, resolución con oráculo, resolución manual, reclamación, doble reclamación, restricciones de estado y participantes.
+
+## Variables de entorno necesarias
+
+Crea `frontend/.env.local` con:
+
+VITE_SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/TU_API_KEY
+
+Para obtener una API key gratuita: https://dashboard.alchemy.com
+(El endpoint `demo` de Alchemy funciona para pruebas pero tiene límites)
