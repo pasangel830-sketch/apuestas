@@ -1,8 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useReadContract } from 'wagmi';
 import { keccak256, toBytes } from 'viem';
-import MockOracleAbi from '../contracts/abi/MockOracle.json';
 import { ORACLE_ADDRESS } from '../contracts/addresses';
 import { PREDICTION_LABELS } from '../config';
 import {
@@ -58,14 +56,6 @@ function OracleMock() {
       return null;
     }
   }, [matchIdString]);
-
-  const { data: oracleResult, refetch: refetchOracleResult } = useReadContract({
-    address: ORACLE_ADDRESS || undefined,
-    abi: MockOracleAbi,
-    functionName: 'getResult',
-    args: matchIdBytes32 ? [matchIdBytes32] : undefined,
-    query: { enabled: Boolean(ORACLE_ADDRESS && matchIdBytes32) },
-  });
 
   useEffect(() => {
     if (!matchIdBytes32) {
@@ -144,11 +134,6 @@ function OracleMock() {
     void reloadMatches();
   }, [reloadMatches]);
 
-  const resolvedLabel =
-    oracleResult && oracleResult[1]
-      ? PREDICTION_LABELS[oracleResult[0]] ?? String(oracleResult[0])
-      : null;
-
   const handleAddMatch = async (e) => {
     e.preventDefault();
     setAddError(null);
@@ -210,7 +195,6 @@ function OracleMock() {
         matchIdString,
         updatedAt: new Date().toISOString(),
       });
-      void refetchOracleResult();
     } catch (err) {
       setApiError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -438,19 +422,6 @@ function OracleMock() {
           <div className="error-box" role="alert" style={{ marginTop: '0.5rem' }}>
             {apiFetchError}
           </div>
-        )}
-
-        {oracleResult && matchIdBytes32 && (
-          <p>
-            <strong>Estado en el contrato (tras fulfill):</strong>{' '}
-            {oracleResult[1] ? (
-              <>
-                {resolvedLabel} (uint8: {String(oracleResult[0])})
-              </>
-            ) : (
-              <span className="hint">Aún no escrito en cadena (falta «Iniciar resolución» o el servidor no pudo firmar)</span>
-            )}
-          </p>
         )}
 
         <form onSubmit={handlePublishToApi} style={{ marginTop: '1rem' }}>
