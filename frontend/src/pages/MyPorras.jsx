@@ -159,27 +159,22 @@ function usePorraCreationTimes(addresses) {
             });
           }
 
-          const CHUNK = 10_000n;
-          let foundLog = null;
-          for (let from = start; from <= latest; from += CHUNK) {
-            const to = from + CHUNK - 1n > latest ? latest : from + CHUNK - 1n;
-            const chunk = await publicClient.getLogs({
-              address: factory,
-              event: PORRA_CREATED_EVENT,
-              args: { game },
-              fromBlock: from,
-              toBlock: to,
-            });
-            if (chunk.length) {
-              foundLog = chunk[0];
-              break;
+          const scan = async (chunkSize) => {
+            // Primero, con filtro args.
+            for (let from = start; from <= latest; from += chunkSize) {
+              const to = from + chunkSize - 1n > latest ? latest : from + chunkSize - 1n;
+              const chunk = await publicClient.getLogs({
+                address: factory,
+                event: PORRA_CREATED_EVENT,
+                args: { game },
+                fromBlock: from,
+                toBlock: to,
+              });
+              if (chunk.length) return chunk[0];
             }
-          }
-
-          // Fallback: algunos RPCs responden vacío con args indexados; filtrar en JS.
-          if (!foundLog) {
-            for (let from = start; from <= latest; from += CHUNK) {
-              const to = from + CHUNK - 1n > latest ? latest : from + CHUNK - 1n;
+            // Fallback: sin args y filtrar en JS.
+            for (let from = start; from <= latest; from += chunkSize) {
+              const to = from + chunkSize - 1n > latest ? latest : from + chunkSize - 1n;
               const chunk = await publicClient.getLogs({
                 address: factory,
                 event: PORRA_CREATED_EVENT,
@@ -189,10 +184,26 @@ function usePorraCreationTimes(addresses) {
               const match = chunk.find(
                 (l) => (l.args?.game || '').toLowerCase() === game.toLowerCase()
               );
-              if (match) {
-                foundLog = match;
-                break;
+              if (match) return match;
+            }
+            return null;
+          };
+
+          let foundLog = null;
+          try {
+            foundLog = await scan(10_000n);
+          } catch (e) {
+            // Alchemy Free: eth_getLogs max 10 blocks.
+            const msg =
+              String(e?.details?.message || e?.shortMessage || e?.message || e);
+            if (/eth_getLogs requests with up to a 10 block range/i.test(msg)) {
+              if (debug) {
+                // eslint-disable-next-line no-console
+                console.warn('[porraDates] rpc log range too large; retrying with 10 blocks');
               }
+              foundLog = await scan(10n);
+            } else {
+              throw e;
             }
           }
 
