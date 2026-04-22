@@ -137,6 +137,9 @@ function usePorraCreationTimes(addresses) {
       queryKey: ['porraCreated', chainId, FACTORY_ADDRESS, addr],
       queryFn: async () => {
         try {
+          const debug =
+            typeof window !== 'undefined' &&
+            window?.localStorage?.getItem?.('debugPorraDates') === '1';
           const game = getAddress(addr);
           const factory = getAddress(FACTORY_ADDRESS);
           const latest = await publicClient.getBlockNumber();
@@ -144,6 +147,17 @@ function usePorraCreationTimes(addresses) {
             FACTORY_DEPLOY_BLOCK && FACTORY_DEPLOY_BLOCK > 0
               ? BigInt(FACTORY_DEPLOY_BLOCK)
               : 0n;
+
+          if (debug) {
+            // eslint-disable-next-line no-console
+            console.log('[porraDates] start', {
+              chainId,
+              factory,
+              game,
+              start: start.toString(),
+              latest: latest.toString(),
+            });
+          }
 
           const CHUNK = 10_000n;
           let foundLog = null;
@@ -162,12 +176,46 @@ function usePorraCreationTimes(addresses) {
             }
           }
 
+          // Fallback: algunos RPCs responden vacío con args indexados; filtrar en JS.
+          if (!foundLog) {
+            for (let from = start; from <= latest; from += CHUNK) {
+              const to = from + CHUNK - 1n > latest ? latest : from + CHUNK - 1n;
+              const chunk = await publicClient.getLogs({
+                address: factory,
+                event: PORRA_CREATED_EVENT,
+                fromBlock: from,
+                toBlock: to,
+              });
+              const match = chunk.find(
+                (l) => (l.args?.game || '').toLowerCase() === game.toLowerCase()
+              );
+              if (match) {
+                foundLog = match;
+                break;
+              }
+            }
+          }
+
           if (!foundLog) return { createdAtMs: null };
           const block = await publicClient.getBlock({
             blockNumber: foundLog.blockNumber,
           });
+          if (debug) {
+            // eslint-disable-next-line no-console
+            console.log('[porraDates] resolved', {
+              blockNumber: foundLog.blockNumber?.toString?.() ?? String(foundLog.blockNumber),
+              timestamp: block.timestamp?.toString?.() ?? String(block.timestamp),
+            });
+          }
           return { createdAtMs: Number(block.timestamp) * 1000 };
-        } catch {
+        } catch (e) {
+          const debug =
+            typeof window !== 'undefined' &&
+            window?.localStorage?.getItem?.('debugPorraDates') === '1';
+          if (debug) {
+            // eslint-disable-next-line no-console
+            console.error('[porraDates] failed', e);
+          }
           return { createdAtMs: null };
         }
       },
