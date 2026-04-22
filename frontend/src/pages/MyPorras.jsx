@@ -137,9 +137,6 @@ function usePorraCreationTimes(addresses) {
       queryKey: ['porraCreated', chainId, FACTORY_ADDRESS, addr],
       queryFn: async () => {
         try {
-          const debug =
-            typeof window !== 'undefined' &&
-            window?.localStorage?.getItem?.('debugPorraDates') === '1';
           const game = getAddress(addr);
           const factory = getAddress(FACTORY_ADDRESS);
           const latest = await publicClient.getBlockNumber();
@@ -147,17 +144,6 @@ function usePorraCreationTimes(addresses) {
             FACTORY_DEPLOY_BLOCK && FACTORY_DEPLOY_BLOCK > 0
               ? BigInt(FACTORY_DEPLOY_BLOCK)
               : 0n;
-
-          if (debug) {
-            // eslint-disable-next-line no-console
-            console.log('[porraDates] start', {
-              chainId,
-              factory,
-              game,
-              start: start.toString(),
-              latest: latest.toString(),
-            });
-          }
 
           const scan = async (chunkSize) => {
             // Primero, con filtro args.
@@ -194,28 +180,8 @@ function usePorraCreationTimes(addresses) {
             foundLog = await scan(10_000n);
           } catch (e) {
             // Alchemy Free: eth_getLogs max 10 blocks.
-            const detailsJson = (() => {
-              try {
-                return typeof e?.details === 'string' ? e.details : JSON.stringify(e?.details);
-              } catch {
-                return undefined;
-              }
-            })();
-            const msg = [
-              e?.details?.message,
-              e?.shortMessage,
-              e?.message,
-              detailsJson,
-              String(e),
-            ]
-              .filter(Boolean)
-              .join(' | ');
-
+            const msg = String(e?.details?.message || e?.shortMessage || e?.message || e);
             if (/up to a 10 block range/i.test(msg)) {
-              if (debug) {
-                // eslint-disable-next-line no-console
-                console.warn('[porraDates] rpc log range too large; retrying with 10 blocks', msg);
-              }
               foundLog = await scan(10n);
             } else {
               throw e;
@@ -226,22 +192,8 @@ function usePorraCreationTimes(addresses) {
           const block = await publicClient.getBlock({
             blockNumber: foundLog.blockNumber,
           });
-          if (debug) {
-            // eslint-disable-next-line no-console
-            console.log('[porraDates] resolved', {
-              blockNumber: foundLog.blockNumber?.toString?.() ?? String(foundLog.blockNumber),
-              timestamp: block.timestamp?.toString?.() ?? String(block.timestamp),
-            });
-          }
           return { createdAtMs: Number(block.timestamp) * 1000 };
-        } catch (e) {
-          const debug =
-            typeof window !== 'undefined' &&
-            window?.localStorage?.getItem?.('debugPorraDates') === '1';
-          if (debug) {
-            // eslint-disable-next-line no-console
-            console.error('[porraDates] failed', e);
-          }
+        } catch {
           return { createdAtMs: null };
         }
       },
