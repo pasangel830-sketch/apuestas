@@ -194,12 +194,27 @@ function usePorraCreationTimes(addresses) {
             foundLog = await scan(10_000n);
           } catch (e) {
             // Alchemy Free: eth_getLogs max 10 blocks.
-            const msg =
-              String(e?.details?.message || e?.shortMessage || e?.message || e);
-            if (/eth_getLogs requests with up to a 10 block range/i.test(msg)) {
+            const detailsJson = (() => {
+              try {
+                return typeof e?.details === 'string' ? e.details : JSON.stringify(e?.details);
+              } catch {
+                return undefined;
+              }
+            })();
+            const msg = [
+              e?.details?.message,
+              e?.shortMessage,
+              e?.message,
+              detailsJson,
+              String(e),
+            ]
+              .filter(Boolean)
+              .join(' | ');
+
+            if (/up to a 10 block range/i.test(msg)) {
               if (debug) {
                 // eslint-disable-next-line no-console
-                console.warn('[porraDates] rpc log range too large; retrying with 10 blocks');
+                console.warn('[porraDates] rpc log range too large; retrying with 10 blocks', msg);
               }
               foundLog = await scan(10n);
             } else {
