@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useQueries } from '@tanstack/react-query';
 import { useAccount, useChainId, usePublicClient, useReadContract } from 'wagmi';
 import { getAddress, parseAbiItem } from 'viem';
-import { FACTORY_ADDRESS } from '../contracts/addresses';
+import { FACTORY_ADDRESS, FACTORY_DEPLOY_BLOCK } from '../contracts/addresses';
 import PorraFactoryAbi from '../contracts/abi/PorraFactory.json';
 import PorraGameAbi from '../contracts/abi/PorraGame.json';
 import { GAME_STATE_LABELS } from '../config';
@@ -138,16 +138,33 @@ function usePorraCreationTimes(addresses) {
       queryFn: async () => {
         try {
           const game = getAddress(addr);
-          const logs = await publicClient.getLogs({
-            address: FACTORY_ADDRESS,
-            event: PORRA_CREATED_EVENT,
-            args: { game },
-            fromBlock: 0n,
-            toBlock: 'latest',
-          });
-          if (!logs.length) return { createdAtMs: null };
+          const factory = getAddress(FACTORY_ADDRESS);
+          const latest = await publicClient.getBlockNumber();
+          const start =
+            FACTORY_DEPLOY_BLOCK && FACTORY_DEPLOY_BLOCK > 0
+              ? BigInt(FACTORY_DEPLOY_BLOCK)
+              : 0n;
+
+          const CHUNK = 10_000n;
+          let foundLog = null;
+          for (let from = start; from <= latest; from += CHUNK) {
+            const to = from + CHUNK - 1n > latest ? latest : from + CHUNK - 1n;
+            const chunk = await publicClient.getLogs({
+              address: factory,
+              event: PORRA_CREATED_EVENT,
+              args: { game },
+              fromBlock: from,
+              toBlock: to,
+            });
+            if (chunk.length) {
+              foundLog = chunk[0];
+              break;
+            }
+          }
+
+          if (!foundLog) return { createdAtMs: null };
           const block = await publicClient.getBlock({
-            blockNumber: logs[0].blockNumber,
+            blockNumber: foundLog.blockNumber,
           });
           return { createdAtMs: Number(block.timestamp) * 1000 };
         } catch {
