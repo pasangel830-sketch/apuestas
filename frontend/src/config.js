@@ -1,4 +1,4 @@
-import { createConfig, http } from 'wagmi';
+import { createConfig, fallback, http } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { mainnet, sepolia } from 'wagmi/chains';
 
@@ -41,8 +41,16 @@ export const config = createConfig({
     ...(isLocal
       ? { 31337: http('http://127.0.0.1:8545') }
       : {
-          [sepolia.id]: http(sepoliaRpcUrl),
-          [mainnet.id]: http(mainnetRpcUrl),
+          [sepolia.id]: fallback([
+            http('https://ethereum-sepolia-rpc.publicnode.com'),
+            http('https://rpc.ankr.com/eth_sepolia'),
+            ...(sepoliaRpcUrl ? [http(sepoliaRpcUrl)] : []),
+          ]),
+          [mainnet.id]: fallback([
+            http('https://ethereum-rpc.publicnode.com'),
+            http('https://rpc.ankr.com/eth'),
+            ...(mainnetRpcUrl ? [http(mainnetRpcUrl)] : []),
+          ]),
         }),
   },
 });
