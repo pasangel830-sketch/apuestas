@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Roadmap interactivo — apuestas (TFM)</title>
+    <style>
+      :root{
+        --bg:#ffffff;
+        --text:#0f172a;
+        --muted:#64748b;
+        --border:#e5e7eb;
+        --panel:#ffffff;
+        --sidebar:#0f1117;
+        --sidebar2:#121722;
+        --sidebarText:#e5e7eb;
+        --sidebarMuted:#94a3b8;
+        --accent:#6366f1;
+        --shadow: 0 10px 30px rgba(15,17,23,.10);
+        --radius: 14px;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family:var(--sans);
+        color:var(--text);
+        background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
+      }
+      a{color:inherit}
+      .app{
+        height:100%;
+        display:grid;
+        grid-template-columns: 360px 1fr;
+      }
+      .sidebar{
+        background: linear-gradient(180deg, var(--sidebar) 0%, #0b0e14 100%);
+        color:var(--sidebarText);
+        border-right:1px solid rgba(255,255,255,.06);
+        display:flex;
+        flex-direction:column;
+        min-width:0;
+      }
+      .sideTop{
+        padding:16px 16px 12px 16px;
+        border-bottom:1px solid rgba(255,255,255,.07);
+      }
+      .title{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        margin-bottom:10px;
+      }
+      .titleLeft{display:flex; align-items:center; gap:10px; min-width:0}
+      .logo{
+        width:36px;height:36px;border-radius:10px;
+        background: radial-gradient(circle at 30% 30%, rgba(99,102,241,.9), rgba(99,102,241,.15));
+        box-shadow: 0 8px 18px rgba(99,102,241,.18);
+        display:grid; place-items:center;
+        flex:0 0 auto;
+      }
+      .logo span{font-weight:800; letter-spacing:.2px}
+      .hgroup{min-width:0}
+      .h1{
+        font-size:14px;
+        font-weight:800;
+        margin:0;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .sub{
+        margin:0;
+        font-size:12px;
+        color:var(--sidebarMuted);
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .btn{
+        border:1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.04);
+        color: var(--sidebarText);
+        border-radius:10px;
+        padding:8px 10px;
+        font-size:12px;
+        cursor:pointer;
+        transition: transform .12s ease, background .12s ease, border-color .12s ease;
+        user-select:none;
+        flex:0 0 auto;
+      }
+      .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16)}
+      .search{
+        position:relative;
+      }
+      .search input{
+        width:100%;
+        border:1px solid rgba(255,255,255,.10);
+        background: rgba(255,255,255,.04);
+        color: var(--sidebarText);
+        border-radius:12px;
+        padding:10px 12px 10px 34px;
+        outline:none;
+        font-size:13px;
+      }
+      .search input::placeholder{color: rgba(229,231,235,.55)}
+      .search .icon{
+        position:absolute; left:12px; top:50%; transform: translateY(-50%);
+        color: rgba(229,231,235,.70);
+        font-size:14px;
+      }
+      .treeWrap{
+        padding:10px 10px 14px 10px;
+        overflow:auto;
+        flex:1 1 auto;
+      }
+      .tree{
+        font-size:13px;
+        line-height:1.35;
+      }
+      .node{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:7px 10px;
+        border-radius:10px;
+        cursor:pointer;
+        user-select:none;
+        transition: background .12s ease, color .12s ease;
+        min-width:0;
+      }
+      .node:hover{background: rgba(255,255,255,.05)}
+      .node.selected{
+        background: rgba(99,102,241,.20);
+        outline: 1px solid rgba(99,102,241,.35);
+      }
+      .node .twisty{
+        width:16px; text-align:center; color: rgba(229,231,235,.70);
+        flex:0 0 auto;
+      }
+      .node .ficon{width:18px; text-align:center; flex:0 0 auto}
+      .node .label{
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+        flex:1 1 auto;
+      }
+      .indent{margin-left:16px; border-left:1px dashed rgba(255,255,255,.08); padding-left:10px}
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        border:1px solid rgba(255,255,255,.12);
+        background: rgba(255,255,255,.05);
+        color: var(--sidebarText);
+        padding:6px 10px;
+        border-radius:999px;
+        font-size:12px;
+      }
+      .sideFooter{
+        padding:12px 16px;
+        border-top:1px solid rgba(255,255,255,.07);
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        color: var(--sidebarMuted);
+        font-size:12px;
+      }
+
+      .main{
+        min-width:0;
+        display:flex;
+        flex-direction:column;
+      }
+      .topbar{
+        position:sticky;
+        top:0;
+        z-index:10;
+        background: rgba(255,255,255,.75);
+        backdrop-filter: blur(10px);
+        border-bottom:1px solid var(--border);
+      }
+      .topInner{
+        padding:14px 18px;
+        display:flex;
+        align-items:center;
+        gap:12px;
+        justify-content:space-between;
+      }
+      .stackToggle{
+        display:flex; align-items:center; gap:10px; min-width:0;
+      }
+      .stackTitle{
+        font-weight:800; font-size:14px; margin:0;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      .muted{color:var(--muted)}
+      .statsRow{
+        padding: 0 18px 14px 18px;
+        display:grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap:12px;
+      }
+      .stat{
+        border:1px solid var(--border);
+        background: var(--panel);
+        border-radius:14px;
+        padding:12px 12px;
+        box-shadow: 0 8px 20px rgba(15,23,42,.05);
+        min-width:0;
+      }
+      .stat .k{
+        font-size:12px; color:var(--muted);
+        margin:0 0 6px 0;
+      }
+      .stat .v{
+        font-size:18px; font-weight:900; margin:0;
+        letter-spacing:-.2px;
+      }
+      .content{
+        padding:18px;
+        display:grid;
+        grid-template-columns: 1fr;
+        gap:14px;
+      }
+      .card{
+        border:1px solid var(--border);
+        background: var(--panel);
+        border-radius: var(--radius);
+        padding:16px;
+        box-shadow: var(--shadow);
+        min-width:0;
+      }
+      .cardHeader{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:12px;
+        margin-bottom:10px;
+      }
+      .cardHeader h2{
+        font-size:14px;
+        margin:0;
+        font-weight:900;
+      }
+      .path{
+        font-family: var(--mono);
+        font-size:12px;
+        color: #334155;
+        background:#f1f5f9;
+        border:1px solid #e2e8f0;
+        padding:6px 10px;
+        border-radius:999px;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        overflow:hidden;
+        max-width:100%;
+      }
+      .badge{
+        display:inline-flex;
+        align-items:center;
+        font-size:12px;
+        font-weight:800;
+        padding:7px 10px;
+        border-radius:999px;
+        border:1px solid transparent;
+        white-space:nowrap;
+      }
+      .badge.comp{background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.30); color:#3730a3}
+      .badge.route{background: rgba(20,184,166,.12); border-color: rgba(20,184,166,.30); color:#0f766e}
+      .badge.cfg{background: rgba(245,158,11,.14); border-color: rgba(245,158,11,.32); color:#92400e}
+      .badge.model{background: rgba(244,63,94,.12); border-color: rgba(244,63,94,.30); color:#9f1239}
+      .badge.util{background: rgba(100,116,139,.14); border-color: rgba(100,116,139,.32); color:#334155}
+      .badge.test{background: rgba(34,197,94,.14); border-color: rgba(34,197,94,.32); color:#166534}
+      .badge.style{background: rgba(236,72,153,.12); border-color: rgba(236,72,153,.30); color:#9d174d}
+      .badge.doc{background: rgba(148,163,184,.18); border-color: rgba(148,163,184,.35); color:#334155}
+      .badge.asset{background: rgba(71,85,105,.12); border-color: rgba(71,85,105,.28); color:#334155}
+      .badge.other{background: rgba(148,163,184,.18); border-color: rgba(148,163,184,.35); color:#334155}
+      .grid2{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:12px;
+      }
+      .kv{
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+        min-width:0;
+      }
+      .kv .k{font-size:12px; color:var(--muted); margin:0}
+      .kv .v{font-size:13px; margin:0; color:#0f172a}
+      .list{
+        margin:0;
+        padding-left:18px;
+        color:#0f172a;
+        font-size:13px;
+      }
+      .chips{
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        margin-top:8px;
+      }
+      .chip{
+        font-size:12px;
+        padding:6px 10px;
+        border-radius:999px;
+        background:#f8fafc;
+        border:1px solid #e2e8f0;
+        color:#0f172a;
+        max-width:100%;
+      }
+      .chip b{font-weight:900}
+      .stackPanel{
+        display:none;
+        border-top:1px solid var(--border);
+        background:#ffffff;
+      }
+      .stackPanel.open{display:block}
+      .stackInner{
+        padding:14px 18px 18px 18px;
+      }
+      .layer{
+        margin-top:10px;
+      }
+      .layer h3{
+        margin:0 0 8px 0;
+        font-size:12px;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+        color:#475569;
+      }
+      .fade{
+        opacity:0;
+        transform: translateY(6px);
+        transition: opacity .18s ease, transform .18s ease;
+      }
+      .fade.show{opacity:1; transform: translateY(0)}
+      .empty{
+        padding:10px 0;
+        color: var(--muted);
+        font-size:13px;
+      }
+      .hint{
+        color: var(--muted);
+        font-size:13px;
+        margin:0;
+      }
+      @media (max-width: 980px){
+        .app{grid-template-columns: 320px 1fr}
+        .statsRow{grid-template-columns: repeat(2, minmax(0, 1fr))}
+      }
+      @media (max-width: 768px){
+        .app{grid-template-columns: 1fr}
+        .sidebar{
+          position:sticky;
+          top:0;
+          z-index:20;
+          max-height: 50vh;
+        }
+        .treeWrap{max-height: calc(50vh - 120px)}
+        .grid2{grid-template-columns:1fr}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="sideTop">
+          <div class="title">
+            <div class="titleLeft">
+              <div class="logo" title="Roadmap">
+                <span>RM</span>
+              </div>
+              <div class="hgroup">
+                <p class="h1">Roadmap interactivo</p>
+                <p class="sub">apuestas — TFM (arquitectura)</p>
+              </div>
+            </div>
+            <button class="btn" id="btnHome" title="Volver a vista general">Vista general</button>
+          </div>
+          <div class="search">
+            <span class="icon">⌕</span>
+            <input id="search" type="text" placeholder="Buscar ficheros y carpetas…" autocomplete="off" />
+          </div>
+          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="pill" id="pillCounts">—</span>
+            <span class="pill" id="pillSelected">Sin selección</span>
+          </div>
+        </div>
+        <div class="treeWrap">
+          <div class="tree" id="tree"></div>
+        </div>
+        <div class="sideFooter">
+          <span id="footerHint">Click en un fichero para ver detalles</span>
+          <span style="font-family:var(--mono)">vanilla</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="topInner">
+            <div class="stackToggle">
+              <button class="btn" id="btnStack">Stack</button>
+              <p class="stackTitle" id="mainTitle">Estado general</p>
+            </div>
+            <div class="muted" id="mainSubtitle" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              Selecciona un fichero para ver su rol, exports e imports
+            </div>
+          </div>
+          <div class="stackPanel open" id="stackPanel">
+            <div class="stackInner">
+              <div id="stackLayers"></div>
+            </div>
+          </div>
+          <div class="statsRow" id="statsRow"></div>
+        </div>
+        <div class="content">
+          <div class="card fade show" id="detailCard">
+            <div id="detailInner"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Datos hardcodeados tras escaneo del repo (excluyendo dependencias/artefactos).
+      const PROJECT = {
+        root: "C:/Proyectos/Master BlockChain/apuestas",
+        stats: {
+          files: 96,
+          folders: 31,
+          locApprox: 16074,
+          countsByType: {
+            "backend-api": 10,
+            "backend-api-dup": 10,
+            "componente": 5,
+            "config": 8,
+            "contrato": 8,
+            "contratos-frontend": 5,
+            "docs": 5,
+            "entrada": 2,
+            "estilos": 2,
+            "hook": 1,
+            "otros": 20,
+            "ruta": 5,
+            "script-deploy": 2,
+            "test-sol": 4,
+            "tipos": 1,
+            "util": 8,
+            "test": 2
+          }
+        },
+        stack: {
+          "Frontend": [
+            { name: "Node", version: "20.x", why: "Runtime para Vite/React y tooling." },
+            { name: "Vite", version: "^7.3.1", why: "Dev server y build del frontend." },
+            { name: "React", version: "^19.2.0", why: "UI de la dApp." },
+            { name: "React Router", version: "^7.13.1", why: "Rutas SPA (/create, /porra/:addr, etc.)." },
+            { name: "wagmi", version: "^3.5.0", why: "Hooks para wallet y lecturas/escrituras on-chain." },
+            { name: "viem", version: "^2.47.1", why: "Utilidades EVM (hashing, parsing) y calls/tx (en local API duplicada)." },
+            { name: "@tanstack/react-query", version: "^5.90.21", why: "Queries y cache de datos (listas/lecturas combinadas)." },
+            { name: "framer-motion", version: "^12.38.0", why: "Animaciones de UI/transiciones." },
+            { name: "Tailwind CSS", version: "^4.2.2", why: "Estilos utilitarios importados en `index.css`." },
+            { name: "TypeScript", version: "^6.0.2", why: "Tipado puntual (p.ej. `TopBar.tsx`, `types/`)." },
+            { name: "Vitest", version: "^4.1.2", why: "Tests unitarios de utilidades." },
+            { name: "ESLint", version: "^9.39.1", why: "Calidad de código en frontend." }
+          ],
+          "Backend": [
+            { name: "Vercel Functions", version: "api/*", why: "Endpoints serverless (/api/health, /api/sports/*, /api/oracle/fulfill)." },
+            { name: "Node", version: "20.x", why: "Runtime de handlers serverless/local." },
+            { name: "pg", version: "^8.20.0", why: "Acceso a PostgreSQL (pool + schema runtime)." },
+            { name: "ethers", version: "^6.13.5", why: "Firma/tx a MockOracle en fulfill (carpeta `api/`)." },
+            { name: "viem", version: "^2.47.1", why: "Firma/tx y hashing en core (carpeta `frontend/api/`)." },
+            { name: "Express", version: "^5.2.1", why: "Servidor local que simula Vercel (`frontend/server/oracle-api.mjs`)." },
+            { name: "dotenv", version: "^17.3.1", why: "Carga de variables en el servidor local." },
+            { name: "cors", version: "^2.8.6", why: "Dependencia de soporte CORS (local), aunque handlers aplican CORS manual." }
+          ],
+          "Base de datos": [
+            { name: "PostgreSQL", version: "16-alpine", why: "Persistencia para resultados/partidos (docker-compose local + DATABASE_URL)." }
+          ],
+          "Blockchain": [
+            { name: "Foundry", version: "forge/cast/anvil", why: "Tooling Solidity: build/test/deploy y entorno local." },
+            { name: "solc", version: "0.8.19", why: "Compilador Solidity configurado en `foundry.toml`." }
+          ],
+          "DevOps/Herramientas": [
+            { name: "Vercel", version: "vercel.json", why: "Build del frontend + deploy de funciones `api/*` + rewrites." },
+            { name: "GitHub Actions", version: ".github/workflows/test.yml", why: "CI: fmt/build/test con Foundry." },
+            { name: "Docker Compose", version: "frontend/docker-compose.yml", why: "Postgres local reproducible." },
+            { name: "concurrently", version: "^9.2.1", why: "Levanta Vite + API local en paralelo." }
+          ]
+        },
+        // Lista plana de rutas (para construir árbol sin servidor).
+        paths: [
+          ".github/workflows/test.yml",
+          ".gitignore",
+          ".gitmodules",
+          "GUIA_PASO_A_PASO.md",
+          "README.md",
+          "README_ENTORNO_LOCAL.md",
+          "api/_lib/cors.mjs",
+          "api/_lib/db.mjs",
+          "api/_lib/oracle-core.mjs",
+          "api/health.js",
+          "api/oracle/fulfill.js",
+          "api/package-lock.json",
+          "api/package.json",
+          "api/sports/matches.js",
+          "api/sports/results/[matchIdHex].mjs",
+          "api/sports/results/index.mjs",
+          "explicacion_contratos/MockOracle.html",
+          "explicacion_contratos/PorraFactory.html",
+          "explicacion_contratos/PorraGame.html",
+          "explicacion_contratos/WhitelistManager.html",
+          "explicacion_contratos/estilo.css",
+          "explicacion_contratos/index.html",
+          "foundry.lock",
+          "foundry.toml",
+          "frontend/.env.example",
+          "frontend/.gitignore",
+          "frontend/README.md",
+          "frontend/VERIFICACION_COMPLETADA.md",
+          "frontend/api/_lib/cors.mjs",
+          "frontend/api/_lib/db.mjs",
+          "frontend/api/_lib/oracle-core.mjs",
+          "frontend/api/health.mjs",
+          "frontend/api/oracle/fulfill.mjs",
+          "frontend/api/package-lock.json",
+          "frontend/api/package.json",
+          "frontend/api/sports/matches.mjs",
+          "frontend/api/sports/results/[matchIdHex].mjs",
+          "frontend/api/sports/results/index.mjs",
+          "frontend/docker-compose.yml",
+          "frontend/eslint.config.js",
+          "frontend/index.html",
+          "frontend/package-lock.json",
+          "frontend/package.json",
+          "frontend/public/vite.svg",
+          "frontend/scripts/gzip-dist.mjs",
+          "frontend/server/data/.gitkeep",
+          "frontend/server/oracle-api.mjs",
+          "frontend/src/App.css",
+          "frontend/src/App.jsx",
+          "frontend/src/assets/react.svg",
+          "frontend/src/components/BettingCountdownCard.jsx",
+          "frontend/src/components/ConnectWallet.jsx",
+          "frontend/src/components/Layout.jsx",
+          "frontend/src/components/MatchEndCountdownCard.jsx",
+          "frontend/src/components/TopBar.tsx",
+          "frontend/src/config.js",
+          "frontend/src/contracts/abi/MockOracle.json",
+          "frontend/src/contracts/abi/PorraFactory.json",
+          "frontend/src/contracts/abi/PorraGame.json",
+          "frontend/src/contracts/abi/WhitelistManager.json",
+          "frontend/src/contracts/addresses.js",
+          "frontend/src/hooks/useChainTimeEstimate.js",
+          "frontend/src/index.css",
+          "frontend/src/main.jsx",
+          "frontend/src/pages/CreatePorra.jsx",
+          "frontend/src/pages/Home.jsx",
+          "frontend/src/pages/MyPorras.jsx",
+          "frontend/src/pages/OracleMock.jsx",
+          "frontend/src/pages/PorraDetail.jsx",
+          "frontend/src/types/nav.ts",
+          "frontend/src/utils/matchIdLookup.js",
+          "frontend/src/utils/oracleApi.js",
+          "frontend/src/utils/oracleOutcome.js",
+          "frontend/src/utils/oracleOutcome.test.js",
+          "frontend/src/utils/participantLabels.js",
+          "frontend/src/utils/registeredMatches.js",
+          "frontend/src/utils/registeredMatches.test.js",
+          "frontend/src/utils/time.js",
+          "frontend/tsconfig.json",
+          "frontend/vite.config.js",
+          "remappings.txt",
+          "script/Deploy.s.sol",
+          "script/DeployAndCreatePorra.s.sol",
+          "src/MockOracle.sol",
+          "src/PorraFactory.sol",
+          "src/PorraGame.sol",
+          "src/WhitelistManager.sol",
+          "src/interfaces/IPorraOracle.sol",
+          "src/utils/Ownable.sol",
+          "src/utils/Pausable.sol",
+          "src/utils/ReentrancyGuard.sol",
+          "test/MockOracle.t.sol",
+          "test/PorraFactory.t.sol",
+          "test/PorraGame.t.sol",
+          "test/WhitelistManager.t.sol",
+          "vercel.json"
+        ],
+        files: {
+          // Config / DevOps / Docs
+          ".github/workflows/test.yml": {
+            type: "config", badge: "cfg",
+            what: "Pipeline CI que ejecuta `forge fmt`, `forge build` y `forge test` para validar contratos en cada push/PR. Hace checkout con submódulos para que Foundry tenga sus librerías. Es la “red de seguridad” para no romper el TFM al iterar en Solidity.",
+            exports: ["job: check", "steps: checkout + foundry-toolchain + forge fmt/build/test"],
+            deps: ["GitHub Actions marketplace: actions/checkout, foundry-rs/foundry-toolchain"]
+          },
+          ".gitignore": { type:"config", badge:"cfg", what:"Reglas de ignore para evitar commitear artefactos (build, caches, keys, etc.) y mantener el repo limpio. Complementa el flujo local (Foundry/Vite) y el despliegue (Vercel).", exports:[], deps:[] },
+          ".gitmodules": { type:"config", badge:"cfg", what:"Define submódulos git (librerías Solidity) usados por Foundry. Permite que `forge` resuelva imports mediante `lib/*` sin copiar dependencias al repo. En CI se hace checkout recursivo para que los tests compilen.", exports:["submodules: lib/forge-std, lib/openzeppelin-contracts"], deps:["git submodules"] },
+          "README.md": { type:"docs", badge:"doc", what:"Documento principal del proyecto con instrucciones de instalación, ejecución local y despliegue. Explica cómo conectar el frontend, la base de datos y los contratos, y qué variables de entorno son necesarias. Sirve como referencia rápida para la defensa.", exports:[], deps:[] },
+          "README_ENTORNO_LOCAL.md": { type:"docs", badge:"doc", what:"Guía detallada para levantar el entorno local desde cero con varias terminales (Anvil, API local, Vite). Incluye comandos `cast/forge` y troubleshooting de puertos/variables. Está pensada para reproducibilidad y demos.", exports:[], deps:[] },
+          "GUIA_PASO_A_PASO.md": { type:"docs", badge:"doc", what:"Guía paso a paso del flujo completo (deploy, crear porra, mock oracle, resolver y reclamar). Aterriza el recorrido funcional del TFM y enlaza conceptos on-chain/off-chain. Útil para ejecutar una demo sin improvisar.", exports:[], deps:["Foundry cast/anvil", "MetaMask"] },
+          "vercel.json": { type:"config", badge:"cfg", what:"Configura el despliegue en Vercel: instala dependencias en `frontend` y `api`, construye `frontend/dist` y expone `api/**/*` como funciones. Define rewrites para `/api/*` y fallback SPA. Es el pegamento entre UI y backend en producción.", exports:["installCommand/buildCommand/outputDirectory/functions/rewrites"], deps:["Vercel platform"] },
+
+          // Backend API (producción)
+          "api/package.json": { type:"config", badge:"cfg", what:"Manifiesto del paquete de funciones serverless de producción (raíz `api/`). Fija Node 20 y dependencias para Postgres y firma de transacciones al oráculo. Asegura que los handlers funcionen igual en local/CI/Vercel.", exports:["dependencies: ethers, pg, viem"], deps:["npm"] },
+          "api/package-lock.json": { type:"config", badge:"cfg", what:"Lockfile npm del paquete `api/` para tener instalaciones deterministas en CI y despliegue. Evita cambios de transitive deps que puedan romper el runtime serverless.", exports:[], deps:["npm"] },
+          "api/_lib/cors.mjs": { type:"util", badge:"util", what:"Utilidad común para aplicar CORS en todos los endpoints serverless. Refleja el Origin y habilita credenciales, y responde a preflight cuando toca. Reduce duplicación y hace la API consumible desde el frontend.", exports:["applyCors(req,res)"], deps:["headers HTTP"] },
+          "api/_lib/db.mjs": { type:"util", badge:"util", what:"Capa de acceso a Postgres para serverless: crea un Pool efímero con `DATABASE_URL`, asegura el esquema (tablas de resultados y partidos) y ejecuta una función con el pool. Centraliza la creación de tablas para que el backend sea “self-healing”.", exports:["ensurePgSchema(clientPool)","withPool(fn)"], deps:["pg (Pool)", "DATABASE_URL"] },
+          "api/_lib/oracle-core.mjs": { type:"util", badge:"util", what:"Core compartido de oráculo y persistencia: normaliza bytes32, hashea matchId, lista/inserta resultados en Postgres y encapsula la escritura on-chain al MockOracle (vía viem). Mantiene la coherencia de IDs entre UI, DB y contrato. Es el corazón del puente off-chain→on-chain.", exports:["listRegisteredMatches","getResultByMatchIdHex","upsertResult","normalizeMatchIdHex","resultIdFromMatchIdString","writeSetResultToChain","loadEnv"], deps:["viem","viem/accounts","Postgres","ORACLE_* env"] },
+          "api/health.js": { type:"ruta", badge:"route", what:"Endpoint de salud para comprobar que el backend está vivo y responde JSON. Se usa para diagnósticos desde el frontend cuando fallan endpoints de deportes. Aplica CORS para que sea accesible en local y en Vercel.", exports:["default handler(req,res)"], deps:["applyCors"] },
+          "api/sports/matches.js": { type:"ruta", badge:"route", what:"Endpoint CRUD de `registered_matches` (GET/POST/DELETE). Permite a la UI registrar partidos (id + label) y mantiene la lista como fuente de verdad en Postgres. Incluye manejo de duplicados y parsing robusto del body.", exports:["default handler(req,res)"], deps:["applyCors","withPool","listRegisteredMatches"] },
+          "api/sports/results/index.mjs": { type:"ruta", badge:"route", what:"Endpoint para publicar resultados de un partido (POST) en la tabla `sports_results`. Genera el bytes32 a partir del string del matchId para que sea el mismo que usa el contrato. Sirve como paso previo a “fulfill” (publicar en cadena).", exports:["default handler(req,res)"], deps:["applyCors","withPool","resultIdFromMatchIdString","upsertResult"] },
+          "api/sports/results/[matchIdHex].mjs": { type:"ruta", badge:"route", what:"Endpoint de lectura de resultados por bytes32 (GET). Convierte/normaliza el id, consulta Postgres y devuelve 404 si no existe. Permite a la UI ver el estado actual del resultado antes de resolver la porra.", exports:["default handler(req,res)"], deps:["applyCors","withPool","getResultByMatchIdHex","normalizeMatchIdHex"] },
+          "api/oracle/fulfill.js": { type:"ruta", badge:"route", what:"Puente serverless que lee el resultado desde Postgres y ejecuta `setResult` en el MockOracle on-chain. Firma la transacción con una private key (env) para simular un oráculo que “cumple” la petición. Conecta el almacenamiento off-chain con la resolución on-chain.", exports:["default handler(req,res)"], deps:["ethers","applyCors","withPool","getResultByMatchIdHex","normalizeMatchIdHex","ORACLE_* env"] },
+
+          // Docs de contratos (HTML)
+          "explicacion_contratos/index.html": { type:"docs", badge:"doc", what:"Página índice de documentación HTML de los contratos. Permite navegar por la explicación generada de cada contrato y sus funciones. Se usa como material de apoyo en la memoria/defensa.", exports:[], deps:["HTML/CSS"] },
+          "explicacion_contratos/MockOracle.html": { type:"docs", badge:"doc", what:"Documentación HTML del contrato `MockOracle`. Resume su API (request/set/get) y eventos, útil para justificar el diseño del oráculo de desarrollo. Complementa los tests y el frontend.", exports:[], deps:["HTML"] },
+          "explicacion_contratos/PorraFactory.html": { type:"docs", badge:"doc", what:"Documentación HTML del contrato `PorraFactory`. Describe el despliegue de porras y el evento `PorraCreated` que el frontend usa para descubrir direcciones. Aporta contexto funcional para la arquitectura.", exports:[], deps:["HTML"] },
+          "explicacion_contratos/PorraGame.html": { type:"docs", badge:"doc", what:"Documentación HTML del contrato `PorraGame`. Explica estados, reglas temporales y funciones críticas (apostar, resolver, reclamar). Sirve para explicar el flujo completo del juego.", exports:[], deps:["HTML"] },
+          "explicacion_contratos/WhitelistManager.html": { type:"docs", badge:"doc", what:"Documentación HTML del contrato `WhitelistManager`. Detalla whitelist y motes, y las validaciones del constructor. Ayuda a entender por qué el frontend puede mostrar nombres y restringir participantes.", exports:[], deps:["HTML"] },
+          "explicacion_contratos/estilo.css": { type:"estilos", badge:"style", what:"Hoja de estilos para las páginas de explicación HTML de contratos. Define tipografía, layout y legibilidad del material de documentación. No afecta al frontend React.", exports:[], deps:["CSS"] },
+
+          // Foundry / Solidity tooling
+          "foundry.toml": { type:"config", badge:"cfg", what:"Configuración de Foundry: rutas (`src/out/lib`), versión de solc y parámetros de optimización/EVM. Garantiza compilación consistente y reproducible entre local y CI. Es la base del pipeline de tests Solidity.", exports:["solc=0.8.19","optimizer=true","paths"], deps:["Foundry"] },
+          "foundry.lock": { type:"config", badge:"cfg", what:"Lockfile de dependencias Foundry. Asegura versiones reproducibles de librerías importadas vía `lib/*` (submódulos/remappings). Reduce riesgo de cambios inesperados al compilar o testear.", exports:[], deps:["Foundry"] },
+          "remappings.txt": { type:"config", badge:"cfg", what:"Remappings para resolver imports Solidity (p.ej. `forge-std/` o librerías en `lib/`). Permite mantener imports limpios sin rutas largas. Se usa por `forge` al compilar.", exports:[], deps:["Foundry remappings"] },
+
+          // Frontend root
+          "frontend/package.json": { type:"config", badge:"cfg", what:"Manifiesto del frontend: dependencias (React/Vite/wagmi/viem), scripts (dev/build/test/lint) y Node 20. Define también el servidor local de API (express) y tooling (ESLint/Vitest/Tailwind). Es el punto de verdad del stack web.", exports:["scripts: dev/build/test/lint","deps: react/vite/wagmi/viem"], deps:["npm"] },
+          "frontend/package-lock.json": { type:"config", badge:"cfg", what:"Lockfile npm del frontend para instalaciones deterministas. Evita que una actualización transitive cambie el comportamiento del build o tests. Importante para reproducibilidad en defensa.", exports:[], deps:["npm"] },
+          "frontend/index.html": { type:"entrada", badge:"other", what:"Documento HTML base que monta la SPA de Vite y carga `src/main.jsx`. Define metadatos y el contenedor root donde React renderiza. En producción se sirve desde `dist/`.", exports:["<div id=root>","script /src/main.jsx"], deps:["Vite"] },
+          "frontend/vite.config.js": { type:"config", badge:"cfg", what:"Config de Vite: plugins React + Tailwind, y proxy `/api` hacia el servidor local (8787) en dev/preview. También define configuración de Vitest (incluye tests en `src/**/*.test.js`). Alinea el flujo local con la API express.", exports:["defineConfig(...)","server.proxy /api"], deps:["vite","@vitejs/plugin-react","@tailwindcss/vite"] },
+          "frontend/eslint.config.js": { type:"config", badge:"cfg", what:"Configuración ESLint flat para frontend (JS/TS/React). Ignora `dist/` y aplica reglas de hooks y refresh. Mantiene consistencia y evita errores típicos (variables sin uso, hooks mal usados).", exports:["export default [..configs]"], deps:["eslint","typescript-eslint","react hooks/refresh plugins"] },
+          "frontend/tsconfig.json": { type:"config", badge:"cfg", what:"Configuración TypeScript del frontend: modo estricto, JSX moderno y `noEmit`. Permite mezclar JS y TS (allowJs) manteniendo tipado donde aporta valor. Se usa especialmente en `TopBar.tsx` y `types/`.", exports:["compilerOptions + include src"], deps:["TypeScript"] },
+          "frontend/.gitignore": { type:"config", badge:"cfg", what:"Ignore específico del frontend (dist, caches, logs, etc.). Evita ruido al desarrollar con Vite y tooling JS. Complementa el `.gitignore` raíz.", exports:[], deps:[] },
+          "frontend/.env.example": { type:"config", badge:"cfg", what:"Plantilla de variables de entorno para configurar RPCs, direcciones de contratos y flags del frontend. Documenta qué claves se necesitan para cambiar de red o usar chain local. No contiene secretos reales.", exports:[], deps:["Vite env"] },
+          "frontend/README.md": { type:"docs", badge:"doc", what:"Documentación específica del frontend: cómo ejecutar Vite, cómo levantar la API local y la DB, y notas de despliegue. Complementa el README raíz con detalles de UI. Útil para onboarding rápido.", exports:[], deps:[] },
+          "frontend/VERIFICACION_COMPLETADA.md": { type:"docs", badge:"doc", what:"Checklist/registro de verificación del proyecto frontend (pruebas manuales, pasos completados). Ayuda a justificar que el sistema fue validado antes de la entrega. Sirve como evidencia de calidad.", exports:[], deps:[] },
+          "frontend/docker-compose.yml": { type:"config", badge:"cfg", what:"Docker Compose para levantar Postgres local (imagen 16-alpine) con credenciales y puerto mapeado. Permite ejecutar la API local apuntando a `DATABASE_URL` y persistir datos con volumen. Hace la demo reproducible sin instalar Postgres.", exports:["service: postgres","volume: apuestas_oracle_pg"], deps:["Docker"] },
+          "frontend/scripts/gzip-dist.mjs": { type:"util", badge:"util", what:"Script de build que recorre `dist/` y genera versiones `.gz` precomprimidas de assets (html/js/css/svg/json, etc.). Reduce tamaño servido cuando el entorno aprovecha `gzip_static`. Se ejecuta automáticamente tras `vite build`.", exports:["script: gzip dist assets"], deps:["node fs/path/zlib"] },
+          "frontend/server/oracle-api.mjs": { type:"backend-api-dup", badge:"route", what:"Servidor local Express que expone las mismas rutas `/api/*` que en Vercel, reutilizando los handlers de `frontend/api/*`. Carga `.env` y valida `DATABASE_URL` para fallar rápido. Es el backend de desarrollo que Vite proxyee en local.", exports:["express app + routes"], deps:["express","dotenv","handlers frontend/api/*","Postgres"] },
+          "frontend/server/data/.gitkeep": { type:"otros", badge:"other", what:"Archivo vacío para mantener el directorio `frontend/server/data` en git. Se usa como placeholder (p.ej. para datos locales) sin introducir lógica. Evita que la carpeta desaparezca en clones limpios.", exports:[], deps:[] },
+
+          // Frontend API duplicada (para local)
+          "frontend/api/package.json": { type:"config", badge:"cfg", what:"Manifiesto de las funciones API duplicadas usadas por el servidor local express. Mantiene dependencias mínimas para Postgres y viem. Permite reutilizar la misma lógica de handlers sin depender del paquete raíz `api/`.", exports:["dependencies: pg, viem"], deps:["npm"] },
+          "frontend/api/package-lock.json": { type:"config", badge:"cfg", what:"Lockfile npm del paquete `frontend/api/` para instalaciones deterministas en el entorno local. Evita variaciones de dependencias que cambien el comportamiento de handlers o del core de oráculo.", exports:[], deps:["npm"] },
+          "frontend/api/_lib/cors.mjs": { type:"util", badge:"util", what:"Misma utilidad CORS que en producción, pero dentro del paquete `frontend/api`. Permite que express re-use handlers y mantenga el mismo contrato de cabeceras. Centraliza preflight y headers comunes.", exports:["applyCors(req,res)"], deps:["headers HTTP"] },
+          "frontend/api/_lib/db.mjs": { type:"util", badge:"util", what:"Misma capa Postgres que en producción: crea Pool efímero, asegura schema y ejecuta función con el pool. Permite que la API local trabaje igual que Vercel Functions. Mantiene tablas `sports_results` y `registered_matches`.", exports:["ensurePgSchema","withPool"], deps:["pg (Pool)","DATABASE_URL"] },
+          "frontend/api/_lib/oracle-core.mjs": { type:"util", badge:"util", what:"Core duplicado para hashing/DB/escritura on-chain, usando viem. Es la versión que el servidor local usa para firmar `setResult` en el MockOracle. Alinea IDs y normalizaciones con el frontend y contratos.", exports:["listRegisteredMatches","getResultByMatchIdHex","upsertResult","normalizeMatchIdHex","resultIdFromMatchIdString","writeSetResultToChain","loadEnv"], deps:["viem","Postgres","ORACLE_* env"] },
+          "frontend/api/health.mjs": { type:"ruta", badge:"route", what:"Endpoint de salud (local) para que la UI compruebe que el backend express está vivo y que la store es Postgres. Se usa como “probe” en errores del cliente de matches. Aplica CORS como el resto de endpoints.", exports:["default handler(req,res)"], deps:["applyCors"] },
+          "frontend/api/sports/matches.mjs": { type:"ruta", badge:"route", what:"CRUD local de `registered_matches` equivalente al de producción. Permite registrar partidos y que el frontend muestre labels legibles. Devuelve siempre la lista actual para simplificar estado en UI.", exports:["default handler(req,res)"], deps:["applyCors","withPool","listRegisteredMatches"] },
+          "frontend/api/sports/results/index.mjs": { type:"ruta", badge:"route", what:"Publica resultados en Postgres (local) y retorna el bytes32. Es el paso de persistencia off-chain antes de empujar on-chain. Valida que outcome sea 0/1/2 y que el matchIdString exista.", exports:["default handler(req,res)"], deps:["applyCors","withPool","resultIdFromMatchIdString","upsertResult"] },
+          "frontend/api/sports/results/[matchIdHex].mjs": { type:"ruta", badge:"route", what:"Lee un resultado por matchId bytes32 desde Postgres en el entorno local. Normaliza el ID (lowercase/bytes32) y devuelve 404 si no existe. Facilita que OracleMock muestre el estado actual.", exports:["default handler(req,res)"], deps:["applyCors","withPool","getResultByMatchIdHex","normalizeMatchIdHex"] },
+          "frontend/api/oracle/fulfill.mjs": { type:"ruta", badge:"route", what:"Puente local que toma un matchIdBytes32, lee el resultado desde Postgres y ejecuta `setResult` en el MockOracle usando viem. Emula el comportamiento de un oráculo que “cumple” la request. Devuelve txHash para trazabilidad.", exports:["default handler(req,res)"], deps:["applyCors","withPool","loadEnv","writeSetResultToChain","ORACLE_* env"] },
+
+          // Frontend app (src/)
+          "frontend/src/main.jsx": { type:"entrada", badge:"other", what:"Punto de entrada React: crea el root y monta providers (Wagmi, React Query, Router). Inicializa el `QueryClient` y carga estilos globales. Es el “bootstrap” del frontend.", exports:["render root"], deps:["react","react-dom","wagmi","@tanstack/react-query","react-router-dom"] },
+          "frontend/src/App.jsx": { type:"ruta", badge:"route", what:"Router principal de la SPA: define las rutas y qué página renderiza en cada path. Envuelve el contenido con `Layout` para compartir TopBar. Centraliza el mapa de navegación del frontend.", exports:["default App()"], deps:["react-router-dom","Layout","pages/*"] },
+          "frontend/src/components/Layout.jsx": { type:"componente", badge:"comp", what:"Layout base que incluye `TopBar` y un `Outlet` para renderizar las páginas. Mantiene consistencia visual y navegación en toda la SPA. Evita duplicar estructura en cada ruta.", exports:["default Layout()"], deps:["react-router-dom Outlet","TopBar"] },
+          "frontend/src/components/TopBar.tsx": { type:"componente", badge:"comp", what:"Barra superior responsive con navegación (desktop/móvil) y estado de wallet. Muestra saldo ETH del usuario conectado y permite conectar/desconectar. Incluye una acción “Acceder por dirección” que navega o hace scroll en Home.", exports:["default TopBar()"], deps:["react-router-dom","wagmi","viem(formatEther)","framer-motion","ConnectWallet","types/nav"] },
+          "frontend/src/components/ConnectWallet.jsx": { type:"componente", badge:"comp", what:"Componente para conectar/desconectar wallet con wagmi. Gestiona errores de conexión y evita estados “pending” repetidos con un lock. Opcionalmente muestra ENS name cuando aplica.", exports:["default ConnectWallet()"], deps:["wagmi hooks","ENS mainnet"] },
+          "frontend/src/components/BettingCountdownCard.jsx": { type:"componente", badge:"comp", what:"Tarjeta de cuenta atrás para el deadline de apuestas. Usa una estimación del tiempo de la cadena para no depender del reloj local. Se emplea en creación y detalle de porra para comunicar ventanas temporales.", exports:["default BettingCountdownCard(...)"], deps:["utils/time formatCountdown"] },
+          "frontend/src/components/MatchEndCountdownCard.jsx": { type:"componente", badge:"comp", what:"Tarjeta de cuenta atrás para el fin estimado de partido. Ayuda a indicar cuándo se puede iniciar resolución. Se basa en tiempo de cadena estimado y puede mostrar hints post-partido.", exports:["default MatchEndCountdownCard(...)"], deps:["utils/time formatCountdown"] },
+          "frontend/src/hooks/useChainTimeEstimate.js": { type:"hook", badge:"util", what:"Hook que estima el tiempo actual de la cadena anclándose al timestamp del último bloque y a un `Date.now()` guardado. Se actualiza cada segundo sin spamear RPCs, y se resincroniza con cambios de bloque. Se usa para habilitar acciones por tiempo y renderizar contadores estables.", exports:["useChainTimeEstimate(blockNumber, extraDeps=[])"], deps:["wagmi publicClient","sessionStorage"] },
+          "frontend/src/pages/Home.jsx": { type:"ruta", badge:"route", what:"Landing con explicación del flujo y CTAs. Incluye sección para acceder a una porra pegando su dirección, y soporta scroll dirigido desde la TopBar vía `location.state`. Hace validación mínima de la dirección antes de navegar a detalle.", exports:["default Home()"], deps:["react-router-dom","wagmi","framer-motion"] },
+          "frontend/src/pages/CreatePorra.jsx": { type:"ruta", badge:"route", what:"Formulario de creación de porras con validaciones y manejo de timeouts de wallet. Pre-carga partidos de la API (Postgres), hashea el matchId de forma consistente y, tras minar, decodifica el evento `PorraCreated` para obtener la dirección del juego. Muestra feedback y cuenta atrás de apuestas.", exports:["default CreatePorra()"], deps:["wagmi","viem","ABIs","contracts/addresses","useChainTimeEstimate","utils/time","utils/registeredMatches"] },
+          "frontend/src/pages/MyPorras.jsx": { type:"ruta", badge:"route", what:"Página de listado de porras asociadas a la cuenta (creador o participante). Consulta a la Factory y cruza datos con registros de partidos para mostrar labels más humanos. Intenta derivar la fecha de creación leyendo logs `PorraCreated` con fallbacks cuando el provider limita búsquedas.", exports:["default MyPorras()"], deps:["wagmi","react-query","viem logs","ABIs","utils/matchIdLookup","utils/registeredMatches"] },
+          "frontend/src/pages/OracleMock.jsx": { type:"ruta", badge:"route", what:"UI de administración del mock de resultados: gestiona `registered_matches` y publica/consulta `sports_results` vía `/api/sports/*`. Calcula el bytes32 (keccak) del id para que coincida con el contrato. Incluye mensajes de error orientados a entorno local (puerto, health, etc.).", exports:["default OracleMock()"], deps:["utils/registeredMatches","utils/oracleOutcome","utils/oracleApi","viem keccak256","contracts/addresses"] },
+          "frontend/src/pages/PorraDetail.jsx": { type:"ruta", badge:"route", what:"Vista principal de una porra: lee estado on-chain (fase, bote, whitelist, deadlines, bets) y ofrece acciones según el estado (apostar, iniciar resolución, resolver, reclamar). Tras `startResolution`, llama al backend una vez para que el servidor firme `setResult` en el MockOracle (fulfill) y luego permite `resolveWithOracle`. Usa estimación de tiempo de cadena para UX estable.", exports:["default PorraDetail()"], deps:["wagmi","viem","ABIs","useChainTimeEstimate","utils/participantLabels","utils/matchIdLookup","utils/oracleApi","utils/registeredMatches"] },
+          "frontend/src/config.js": { type:"config", badge:"cfg", what:"Configuración de wagmi/chains y labels de UI. Permite alternar entre chain local (31337) y redes públicas, y define transports RPC con fallbacks. Centraliza `PREDICTION_LABELS` y `GAME_STATE_LABELS` para consistencia en toda la app.", exports:["chains","config","PREDICTION_LABELS","GAME_STATE_LABELS"], deps:["wagmi","env VITE_*"] },
+          "frontend/src/contracts/addresses.js": { type:"config", badge:"cfg", what:"Direcciones y parámetros de despliegue consumidos por el frontend (Factory, Oracle y bloque de deploy). Se leen desde variables Vite para poder cambiar red sin recompilar lógica. Mantiene el acoplamiento de UI con contratos desplegados.", exports:["FACTORY_ADDRESS","ORACLE_ADDRESS","FACTORY_DEPLOY_BLOCK"], deps:["VITE_* env"] },
+          "frontend/src/contracts/abi/MockOracle.json": { type:"contratos-frontend", badge:"model", what:"ABI del contrato `MockOracle` usado por el frontend para interactuar (set/get/request) según la red. Permite a wagmi/viem generar calls y decodificar eventos. Debe estar alineado con `src/MockOracle.sol`.", exports:["ABI JSON"], deps:["Solidity build artifacts"] },
+          "frontend/src/contracts/abi/PorraFactory.json": { type:"contratos-frontend", badge:"model", what:"ABI del contrato `PorraFactory` para crear porras y listar direcciones asociadas. Se usa en CreatePorra/MyPorras para lecturas y para decodificar `PorraCreated`. Mantenerlo sincronizado evita bugs de decode.", exports:["ABI JSON"], deps:["Solidity build artifacts"] },
+          "frontend/src/contracts/abi/PorraGame.json": { type:"contratos-frontend", badge:"model", what:"ABI del contrato `PorraGame` para leer estado, apostar y resolver/reclamar. Es la base de la página PorraDetail. Debe reflejar firmas exactas del contrato on-chain.", exports:["ABI JSON"], deps:["Solidity build artifacts"] },
+          "frontend/src/contracts/abi/WhitelistManager.json": { type:"contratos-frontend", badge:"model", what:"ABI del contrato `WhitelistManager` para leer whitelist y motes desde el frontend. Se usa principalmente en PorraDetail para mostrar participantes autorizados. Mantiene a la UI desacoplada del storage interno.", exports:["ABI JSON"], deps:["Solidity build artifacts"] },
+          "frontend/src/utils/oracleApi.js": { type:"util", badge:"util", what:"Helper que construye URLs a la API bajo `/api/...` en el mismo origen. Evita concatenaciones frágiles y mantiene el contrato de rutas estable. Es usado por clientes de matches/resultados y por páginas.", exports:["oracleApiUrl(path)"], deps:[] },
+          "frontend/src/utils/oracleOutcome.js": { type:"util", badge:"util", what:"Mapeo entre valores de UI (1/X/2) y el `uint8` del contrato (0/1/2), más funciones de conversión con validación. Evita incoherencias entre frontend y lógica on-chain. Es clave para publicar resultados correctos.", exports:["OUTCOME_UI_TO_CHAIN","OUTCOME_CHAIN_TO_UI","uiOutcomeToChain","chainOutcomeToUi"], deps:[] },
+          "frontend/src/utils/oracleOutcome.test.js": { type:"test", badge:"test", what:"Tests Vitest que validan el mapeo UI↔chain de outcomes y su manejo de inputs inválidos. Protege una parte crítica del flujo de resolución al evitar publicar outcomes incorrectos. Sirve como contrato estable del frontend.", exports:["tests"], deps:["vitest"] },
+          "frontend/src/utils/matchIdLookup.js": { type:"util", badge:"util", what:"Utilidades para mapear un `matchId` on-chain (bytes32) a registros humanos `{id,label}` de la DB usando keccak. Permite que MyPorras/PorraDetail muestren un label legible cuando existe. Incluye tolerancia a ids no decodificables.", exports:["lookupRegisteredMatchByChainId","displayMatchLabel"], deps:["viem keccak256/toBytes"] },
+          "frontend/src/utils/participantLabels.js": { type:"util", badge:"util", what:"Construye entradas de whitelist y etiquetas de jugadores a partir de direcciones y motes. Protege la UI cuando la lectura de motes falla o viene desalineada. Centraliza la lógica de “qué mostrar” para no duplicarla en páginas.", exports:["buildWhitelistEntries","buildWhitelistDisplayLines","playerDisplayLabel"], deps:[] },
+          "frontend/src/utils/time.js": { type:"util", badge:"util", what:"Funciones de tiempo para UI: formateo de cuenta atrás y conversión a formato `datetime-local`. Evita repetir lógica de renderizado de fechas y asegura consistencia entre CreatePorra y contadores. Maneja clamps y padding.", exports:["formatCountdown","toDatetimeLocalValue"], deps:[] },
+          "frontend/src/utils/registeredMatches.js": { type:"util", badge:"util", what:"Cliente robusto de la API de partidos (`/api/sports/matches`) con parsing tolerante (texto/JSON) y mensajes de error diagnósticos para el entorno local (casos típicos: puerto 8787 sirviendo HTML/404). Incluye un health probe a `/api/health` para afinar la causa del fallo. Provee funciones para listar, añadir y borrar registros.", exports:["fetchRegisteredMatches","addRegisteredMatch","removeRegisteredMatch"], deps:["utils/oracleApi","fetch"] },
+          "frontend/src/utils/registeredMatches.test.js": { type:"test", badge:"test", what:"Tests Vitest del cliente de partidos que simulan el backend con un store en memoria. Cubre alta/baja, duplicados, id vacío y respuestas de error para asegurar contrato estable. Protege la parte de OracleMock y creación de porras que depende de estos endpoints.", exports:["tests"], deps:["vitest","fetch stubs"] },
+          "frontend/src/types/nav.ts": { type:"tipos", badge:"other", what:"Tipos TypeScript para describir entradas de navegación de la TopBar (rutas vs acciones). Mantiene tipado de callbacks y propiedades comunes sin meter lógica. Ayuda a que el componente TopBar sea más mantenible.", exports:["NavRouteItem","NavActionItem","TopBarNavEntry"], deps:["react types"] },
+          "frontend/src/index.css": { type:"estilos", badge:"style", what:"Estilos globales del frontend e import de Tailwind v4. Define variables, clases y ajustes de layout para la dApp (topbar, botones, contenedores). Complementa `App.css` para estilos más específicos de páginas.", exports:["CSS global + @import tailwindcss"], deps:["Tailwind CSS"] },
+          "frontend/src/App.css": { type:"estilos", badge:"style", what:"Hoja de estilos principal con reglas extensas para componentes visuales y páginas (cards, forms, layout de detalle, leaderboard, etc.). Aporta la estética final de la dApp sin depender de frameworks CSS externos adicionales. Consolida estilos específicos que no son solo utilidades.", exports:["CSS de UI"], deps:["CSS"] },
+          "frontend/public/vite.svg": { type:"otros", badge:"asset", what:"Asset SVG incluido por el template de Vite para iconografía/base. No afecta a la lógica del proyecto pero forma parte de la carpeta `public`. Puede usarse como favicon o recurso estático.", exports:[], deps:["SVG"] },
+          "frontend/src/assets/react.svg": { type:"otros", badge:"asset", what:"Asset SVG de React usado en la plantilla o como recurso visual. No contiene lógica del TFM; es un recurso estático. Se incluye para completar el build de assets.", exports:[], deps:["SVG"] },
+
+          // Solidity contracts
+          "src/interfaces/IPorraOracle.sol": { type:"modelo", badge:"model", what:"Interfaz mínima de oráculo para que `PorraGame` dependa de un contrato abstracto. Define cómo pedir resultado y cómo leerlo (resultado + flag de disponibilidad). Facilita sustituir MockOracle por otro oráculo sin tocar el juego.", exports:["interface IPorraOracle"], deps:["Solidity"] },
+          "src/utils/Ownable.sol": { type:"util", badge:"util", what:"Utilidad de ownership (owner + modifier `onlyOwner`) para restringir funciones administrativas. Se usa en Factory, Game, MockOracle y WhitelistManager para operaciones sensibles. Evita depender de OpenZeppelin para este patrón básico.", exports:["contract Ownable"], deps:["Solidity"] },
+          "src/utils/Pausable.sol": { type:"util", badge:"util", what:"Utilidad de pausa con modifiers `whenNotPaused/whenPaused`. Permite bloquear acciones críticas si hay un problema (p.ej. apuestas o resolución). Se integra en `PorraGame` como mecanismo de seguridad.", exports:["contract Pausable"], deps:["Solidity"] },
+          "src/utils/ReentrancyGuard.sol": { type:"util", badge:"util", what:"Guard anti-reentrancy con modifier `nonReentrant`. Protege funciones que mueven fondos y transiciones sensibles. Se usa en `PorraGame` para evitar ataques clásicos en pagos.", exports:["contract ReentrancyGuard"], deps:["Solidity"] },
+          "src/MockOracle.sol": { type:"modelo", badge:"model", what:"Oráculo de desarrollo que almacena resultados por matchId bytes32. Permite emitir una “request” (evento) y que el owner publique el resultado mediante `setResult`. `PorraGame` lo consulta para resolver el juego sin depender de un oráculo real.", exports:["contract MockOracle"], deps:["IPorraOracle","Ownable"] },
+          "src/WhitelistManager.sol": { type:"modelo", badge:"model", what:"Contrato que gestiona whitelist de participantes y motes asociados. Valida tamaños, unicidad y límites en el constructor y permite añadir/quitar por owner. Se despliega por porra para encapsular participantes permitidos.", exports:["contract WhitelistManager"], deps:["Ownable"] },
+          "src/PorraGame.sol": { type:"modelo", badge:"model", what:"Contrato principal: gestiona estados, stake, apuestas, ventanas temporales y reparto del bote. Integra whitelist, pausa y protección reentrancy, y permite resolver con oráculo o manualmente por owner como fallback. Implementa `claimReward` pull-based para pagos seguros.", exports:["contract PorraGame"], deps:["IPorraOracle","WhitelistManager","ReentrancyGuard","Pausable","Ownable"] },
+          "src/PorraFactory.sol": { type:"modelo", badge:"model", what:"Factory que despliega porras (WhitelistManager + PorraGame) y registra por creador/participante para listados. Emite `PorraCreated`, que el frontend decodifica para obtener la dirección de la porra recién creada. Permite actualizar el oráculo global con control de owner.", exports:["contract PorraFactory"], deps:["PorraGame","WhitelistManager","Ownable"] },
+
+          // Deploy scripts
+          "script/Deploy.s.sol": { type:"otros", badge:"other", what:"Script Foundry para desplegar MockOracle y PorraFactory y mostrar direcciones. Se usa para arrancar local (Anvil) o desplegar en testnet ajustando RPC/PK. Reduce pasos manuales y errores de copia/pega.", exports:["forge script deploy"], deps:["forge-std Script/console"] },
+          "script/DeployAndCreatePorra.s.sol": { type:"otros", badge:"other", what:"Script Foundry que despliega y crea una porra de ejemplo con 3 participantes y stake de 5 ETH, incluyendo una apuesta inicial. Sirve como smoke test reproducible del flujo que luego usa el frontend. Útil para preparar demos rápidas.", exports:["forge script deploy+create"], deps:["forge-std Script/console"] },
+
+          // Solidity tests
+          "test/MockOracle.t.sol": { type:"test", badge:"test", what:"Tests de MockOracle: valida set/get y condiciones de error (outcome inválido, restricciones). Asegura que el oráculo de desarrollo se comporta como espera el juego. Sirve como base del pipeline CI de Solidity.", exports:["forge tests"], deps:["Foundry test framework"] },
+          "test/WhitelistManager.t.sol": { type:"test", badge:"test", what:"Tests de WhitelistManager: cubre validaciones del constructor, add/remove, límites y casos de datos inconsistentes. Garantiza que la whitelist y motes no se corrompen. Protege UX y seguridad del juego.", exports:["forge tests"], deps:["Foundry test framework"] },
+          "test/PorraGame.t.sol": { type:"test", badge:"test", what:"Tests de PorraGame: apuesta, transición de estados, resolución con oráculo, fallback manual, y reclamación de premios (incluye caso sin ganadores). Usa `warp` para simular tiempos y valida que los pagos son correctos. Refuerza las invariantes económicas del contrato.", exports:["forge tests"], deps:["Foundry test framework"] },
+          "test/PorraFactory.t.sol": { type:"test", badge:"test", what:"Tests de PorraFactory: creación, evento `PorraCreated`, y listados por creador/participante. Verifica que la fábrica registra correctamente las porras para que el frontend pueda listarlas. Alinea el flujo de la UI con el contrato.", exports:["forge tests"], deps:["Foundry test framework"] }
+        }
+      };
+
+      function slugTypeToBadgeClass(type) {
+        const t = String(type || "").toLowerCase();
+        if (t === "componente") return "comp";
+        if (t === "ruta" || t === "backend-api" || t === "backend-api-dup") return "route";
+        if (t === "config") return "cfg";
+        if (t === "modelo" || t === "contratos-frontend" || t === "contrato") return "model";
+        if (t === "util" || t === "hook") return "util";
+        if (t === "test" || t === "test-sol") return "test";
+        if (t === "estilos") return "style";
+        if (t === "docs") return "doc";
+        if (t === "entrada") return "other";
+        if (t === "otros") return "other";
+        return "other";
+      }
+
+      const ICONS_BY_EXT = {
+        "sol": "⛓️",
+        "s.sol": "🚀",
+        "t.sol": "🧪",
+        "mjs": "🟨",
+        "js": "🟨",
+        "jsx": "⚛️",
+        "ts": "🟦",
+        "tsx": "⚛️",
+        "css": "🎨",
+        "yml": "⚙️",
+        "yaml": "⚙️",
+        "json": "🧩",
+        "md": "📘",
+        "html": "🌐",
+        "svg": "🖼️",
+        "toml": "⚙️",
+        "txt": "📄",
+        "lock": "🔒"
+      };
+
+      function extOf(p){
+        const name = p.split("/").pop() || p;
+        if (name.endsWith(".t.sol")) return "t.sol";
+        if (name.endsWith(".s.sol")) return "s.sol";
+        const i = name.lastIndexOf(".");
+        return i === -1 ? "" : name.slice(i+1).toLowerCase();
+      }
+      function iconForPath(p, isDir){
+        if (isDir) return "📁";
+        const e = extOf(p);
+        return ICONS_BY_EXT[e] || "📄";
+      }
+
+      function buildTreeFromPaths(paths){
+        const root = { name:"(root)", path:"", isDir:true, children:new Map() };
+        for (const full of paths){
+          const parts = full.split("/").filter(Boolean);
+          let cur = root;
+          let acc = "";
+          for (let i=0;i<parts.length;i++){
+            const part = parts[i];
+            acc = acc ? (acc + "/" + part) : part;
+            const isLast = i === parts.length-1;
+            const isDir = !isLast ? true : false;
+            if (!cur.children.has(part)){
+              cur.children.set(part, { name:part, path:acc, isDir, children:new Map() });
+            }
+            cur = cur.children.get(part);
+            if (isLast) cur.isDir = false;
+          }
+        }
+        return root;
+      }
+
+      const state = {
+        expanded: new Set(["api","frontend","src","test","script","frontend/src","frontend/src/pages","frontend/src/components","frontend/src/utils","frontend/api","frontend/api/sports","api/sports","api/sports/results","frontend/api/sports/results","src/utils","src/interfaces","explicacion_contratos",".github",".github/workflows"]),
+        selectedPath: null,
+        query: ""
+      };
+
+      const els = {
+        tree: document.getElementById("tree"),
+        search: document.getElementById("search"),
+        btnHome: document.getElementById("btnHome"),
+        btnStack: document.getElementById("btnStack"),
+        stackPanel: document.getElementById("stackPanel"),
+        stackLayers: document.getElementById("stackLayers"),
+        statsRow: document.getElementById("statsRow"),
+        detailInner: document.getElementById("detailInner"),
+        pillCounts: document.getElementById("pillCounts"),
+        pillSelected: document.getElementById("pillSelected"),
+        mainTitle: document.getElementById("mainTitle"),
+        mainSubtitle: document.getElementById("mainSubtitle"),
+        footerHint: document.getElementById("footerHint")
+      };
+
+      function normalizeQuery(q){
+        return String(q||"").trim().toLowerCase();
+      }
+      function matchesQuery(nodePath, nodeName, q){
+        if (!q) return true;
+        const hay = (nodePath + " " + nodeName).toLowerCase();
+        return hay.includes(q);
+      }
+      function anyDescendantMatches(node, q){
+        for (const child of node.children.values()){
+          if (matchesQuery(child.path, child.name, q)) return true;
+          if (child.isDir && anyDescendantMatches(child, q)) return true;
+        }
+        return false;
+      }
+      function sortChildren(map){
+        const arr = Array.from(map.values());
+        arr.sort((a,b)=>{
+          if (a.isDir !== b.isDir) return a.isDir ? -1 : 1;
+          return a.name.localeCompare(b.name);
+        });
+        return arr;
+      }
+
+      function renderTree(){
+        const q = state.query;
+        const root = buildTreeFromPaths(PROJECT.paths);
+        els.tree.innerHTML = "";
+
+        function renderNode(node, depth){
+          if (node.path && !matchesQuery(node.path, node.name, q)){
+            if (!(node.isDir && anyDescendantMatches(node, q))) return null;
+          }
+          const row = document.createElement("div");
+          row.className = "node" + (state.selectedPath === node.path ? " selected" : "");
+          row.style.marginLeft = (depth*2) + "px";
+          row.dataset.path = node.path;
+          row.dataset.isdir = String(node.isDir);
+
+          const twisty = document.createElement("div");
+          twisty.className = "twisty";
+          const expanded = node.isDir && state.expanded.has(node.path || "(root)");
+          twisty.textContent = node.isDir ? (expanded ? "▾" : "▸") : " ";
+          row.appendChild(twisty);
+
+          const ic = document.createElement("div");
+          ic.className = "ficon";
+          ic.textContent = iconForPath(node.path || node.name, node.isDir);
+          row.appendChild(ic);
+
+          const label = document.createElement("div");
+          label.className = "label";
+          label.textContent = node.name;
+          row.appendChild(label);
+
+          row.addEventListener("click", (e)=>{
+            e.stopPropagation();
+            const isKnownFile = Boolean(node.path && PROJECT.files && PROJECT.files[node.path]);
+            const isFolder = Boolean(node.isDir) && !isKnownFile;
+            if (isFolder){
+              const key = node.path || "(root)";
+              if (state.expanded.has(key)) state.expanded.delete(key);
+              else state.expanded.add(key);
+              renderTree();
+              return;
+            }
+            selectFile(node.path);
+          });
+
+          const container = document.createElement("div");
+          container.appendChild(row);
+
+          if (node.isDir){
+            const key = node.path || "(root)";
+            const shouldShowChildren = state.expanded.has(key) || q;
+            if (shouldShowChildren){
+              const wrap = document.createElement("div");
+              wrap.className = depth === 0 ? "" : "indent";
+              for (const child of sortChildren(node.children)){
+                const childEl = renderNode(child, depth+1);
+                if (childEl) wrap.appendChild(childEl);
+              }
+              if (wrap.childNodes.length) container.appendChild(wrap);
+            }
+          }
+          return container;
+        }
+
+        // Render root children (no root line).
+        for (const child of sortChildren(root.children)){
+          const el = renderNode(child, 0);
+          if (el) els.tree.appendChild(el);
+        }
+      }
+
+      function renderStack(){
+        els.stackLayers.innerHTML = "";
+        for (const [layerName, items] of Object.entries(PROJECT.stack)){
+          const layer = document.createElement("div");
+          layer.className = "layer";
+          const h = document.createElement("h3");
+          h.textContent = layerName;
+          layer.appendChild(h);
+          const chips = document.createElement("div");
+          chips.className = "chips";
+          for (const t of items){
+            const c = document.createElement("div");
+            c.className = "chip";
+            c.innerHTML = "<b>" + escapeHtml(t.name) + "</b>" + " <span class='muted' style='font-size:12px'>(" + escapeHtml(t.version) + ")</span><div class='muted' style='margin-top:4px; font-size:12px'>" + escapeHtml(t.why) + "</div>";
+            chips.appendChild(c);
+          }
+          layer.appendChild(chips);
+          els.stackLayers.appendChild(layer);
+        }
+      }
+
+      function renderStats(){
+        els.pillCounts.textContent = PROJECT.stats.files + " ficheros • " + PROJECT.stats.folders + " carpetas";
+        els.statsRow.innerHTML = "";
+        const items = [
+          { k: "Ficheros", v: String(PROJECT.stats.files) },
+          { k: "Carpetas", v: String(PROJECT.stats.folders) },
+          { k: "Líneas (aprox.)", v: String(PROJECT.stats.locApprox) },
+          { k: "Componentes / Rutas / Contratos", v: PROJECT.stats.countsByType.componente + " / " + PROJECT.stats.countsByType.ruta + " / " + PROJECT.stats.countsByType.modelo }
+        ];
+        for (const it of items){
+          const d = document.createElement("div");
+          d.className = "stat";
+          d.innerHTML = "<p class='k'>" + escapeHtml(it.k) + "</p><p class='v'>" + escapeHtml(it.v) + "</p>";
+          els.statsRow.appendChild(d);
+        }
+      }
+
+      function fileMeta(path){
+        return PROJECT.files[path] || null;
+      }
+
+      function selectFile(path){
+        if (!path) return;
+        state.selectedPath = path;
+        els.pillSelected.textContent = "Seleccionado: " + (path.split("/").pop() || path);
+        els.footerHint.textContent = "Archivo seleccionado";
+        renderTree();
+        renderDetail(path);
+      }
+
+      function resetToGeneral(){
+        state.selectedPath = null;
+        els.pillSelected.textContent = "Sin selección";
+        els.footerHint.textContent = "Click en un fichero para ver detalles";
+        els.mainTitle.textContent = "Estado general";
+        els.mainSubtitle.textContent = "Stack + estadísticas del proyecto";
+        els.stackPanel.classList.add("open");
+        renderTree();
+        renderGeneralDetail();
+      }
+
+      function renderGeneralDetail(){
+        const counts = PROJECT.stats.countsByType;
+        const breakdown = Object.entries(counts)
+          .sort((a,b)=> b[1]-a[1])
+          .map(([k,v])=> ({k, v}));
+
+        const rows = breakdown.map(x=> "<div class='chip'><b>" + escapeHtml(x.k) + "</b> <span class='muted'>(" + x.v + ")</span></div>").join("");
+
+        els.detailInner.innerHTML = `
+          <div class="cardHeader">
+            <div style="min-width:0">
+              <h2>Visión general</h2>
+              <p class="hint">Este roadmap está hardcodeado tras escanear el repo y leer el código propio (sin dependencias/artefactos).</p>
+            </div>
+            <span class="badge other">Proyecto</span>
+          </div>
+          <div class="grid2">
+            <div class="kv">
+              <p class="k">Repositorio</p>
+              <p class="v"><span class="path" title="${escapeHtml(PROJECT.root)}">📦 ${escapeHtml(PROJECT.root)}</span></p>
+            </div>
+            <div class="kv">
+              <p class="k">Cómo usar</p>
+              <p class="v">Busca, expande carpetas y selecciona un fichero para ver rol, exports e imports.</p>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <p class="k muted" style="margin:0 0 8px 0; font-size:12px">Conteos por tipo</p>
+            <div class="chips">${rows}</div>
+          </div>
+          <div style="margin-top:12px">
+            <p class="k muted" style="margin:0 0 8px 0; font-size:12px">Notas</p>
+            <ul class="list">
+              <li>Los endpoints existen duplicados: producción en <span style="font-family:var(--mono)">api/</span> y local en <span style="font-family:var(--mono)">frontend/api/</span> (reusados por express).</li>
+              <li>El flujo clave es DB (Postgres) → fulfill (server) → <span style="font-family:var(--mono)">MockOracle.setResult</span> → resolución on-chain en <span style="font-family:var(--mono)">PorraGame</span>.</li>
+            </ul>
+          </div>
+        `;
+      }
+
+      function renderDetail(path){
+        try {
+          const safePath = String(path || "");
+          const meta = fileMeta(safePath);
+          const name = (safePath.split("/").pop() || safePath);
+          const isKnown = Boolean(meta);
+          const type = isKnown ? meta.type : "otros";
+          const badgeClass = slugTypeToBadgeClass(type);
+
+          els.mainTitle.textContent = name;
+          els.mainSubtitle.textContent = safePath;
+          els.stackPanel.classList.remove("open");
+
+          const exportsHtml = (meta && meta.exports && meta.exports.length)
+            ? ("<ul class='list'>" + meta.exports.map(x=> "<li>" + escapeHtml(x) + "</li>").join("") + "</ul>")
+            : "<div class='empty'>No aplica o no expone exports relevantes.</div>";
+
+          const depsHtml = (meta && meta.deps && meta.deps.length)
+            ? ("<div class='chips'>" + meta.deps.map(x=> "<div class='chip'>" + escapeHtml(x) + "</div>").join("") + "</div>")
+            : "<div class='empty'>Sin imports/deps destacables (o fichero de recursos/config).</div>";
+
+          let ico = "📄";
+          try { ico = iconForPath(safePath,false); } catch {}
+
+          els.detailInner.innerHTML = `
+            <div class="cardHeader">
+              <div style="min-width:0">
+                <h2>Detalle de fichero</h2>
+                <div class="path" title="${escapeHtml(safePath)}">${escapeHtml(ico)} ${escapeHtml(safePath)}</div>
+              </div>
+              <span class="badge ${badgeClass}">${escapeHtml(type)}</span>
+            </div>
+            <div class="grid2">
+              <div class="kv">
+                <p class="k">Qué hace</p>
+                <p class="v">${escapeHtml(isKnown ? meta.what : "Fichero no indexado en el resumen. Forma parte del repo, pero no se detectó metadato específico en este roadmap.")}</p>
+              </div>
+              <div class="kv">
+                <p class="k">Tipo</p>
+                <p class="v">${escapeHtml(type)}</p>
+              </div>
+            </div>
+            <div style="margin-top:12px">
+              <p class="k muted" style="margin:0 0 8px 0; font-size:12px">Exports / piezas principales</p>
+              ${exportsHtml}
+            </div>
+            <div style="margin-top:12px">
+              <p class="k muted" style="margin:0 0 8px 0; font-size:12px">Dependencias / imports (resumen)</p>
+              ${depsHtml}
+            </div>
+          `;
+        } catch (err) {
+          const msg = err instanceof Error ? (err.message + (err.stack ? "\n" + err.stack : "")) : String(err);
+          els.detailInner.innerHTML = `
+            <div class="cardHeader">
+              <div style="min-width:0">
+                <h2>Detalle de fichero</h2>
+                <p class="hint">Se produjo un error renderizando el detalle. Este bloque ayuda a diagnosticarlo.</p>
+              </div>
+              <span class="badge other">error</span>
+            </div>
+            <div class="path" style="white-space:pre-wrap; border-radius:14px">${escapeHtml(msg)}</div>
+          `;
+        }
+
+        const card = document.getElementById("detailCard");
+        card.classList.remove("show");
+        requestAnimationFrame(()=> card.classList.add("show"));
+      }
+
+      function escapeHtml(s){
+        return String(s).replace(/[&<>"']/g, (c)=>({
+          "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+        }[c]));
+      }
+
+      els.search.addEventListener("input", ()=>{
+        state.query = normalizeQuery(els.search.value);
+        renderTree();
+      });
+
+      els.btnHome.addEventListener("click", ()=>{
+        resetToGeneral();
+      });
+
+      els.btnStack.addEventListener("click", ()=>{
+        els.stackPanel.classList.toggle("open");
+      });
+
+      // Init
+      renderStack();
+      renderStats();
+      renderTree();
+      resetToGeneral();
+    </script>
+  </body>
+</html>
