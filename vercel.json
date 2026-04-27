@@ -10,6 +10,7 @@
   },
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/:path*" },
+    { "source": "/road_map.html", "destination": "/road_map.html" },
     { "source": "/:path*", "destination": "/index.html" }
   ]
 }
