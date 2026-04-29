@@ -95,9 +95,11 @@ function OracleMock() {
       .catch(() => {
         if (!cancelled) {
           setApiRow(null);
-          setApiFetchError(
-            'No se pudo contactar la API deportiva. Usa npm run dev en frontend/ para levantar Vite + oracle-api, o revisa el proxy en vite.config.',
-          );
+          if (!import.meta.env.PROD) {
+            setApiFetchError(
+              'No se pudo contactar la API deportiva. Usa npm run dev en frontend/ para levantar Vite + oracle-api, o revisa el proxy en vite.config.',
+            );
+          }
         }
       })
       .finally(() => {

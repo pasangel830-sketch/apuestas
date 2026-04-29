@@ -108,8 +108,8 @@ export default function BuddyBetsExploreSlide() {
           href="https://buddybets-mu.vercel.app/road_map.html"
           tone="frontend"
           eyebrow="Roadmap"
-          title="Qué viene después 🧭"
-          desc="La visión y los hitos para llevar BuddyBets de MVP a producto irresistible."
+          title="Arquetipo de la App 🧭"
+          desc="Recorre el Arquetipo de la app visualiza los detalles de cada fichero."
         />
         <ExternalCtaCard
           href="https://buddybets-mu.vercel.app/storytelling"

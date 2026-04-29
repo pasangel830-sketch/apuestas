@@ -91,7 +91,7 @@ export default function Storytelling() {
               Web3 Storytelling Experience
             </p>
             <h1 className="mt-2 line-clamp-2 text-balance font-display text-2xl font-semibold tracking-tight text-[var(--text-primary)] sm:text-3xl">
-              Entiende la porra on-chain paso a paso
+              Recorre el proceso paso a paso
             </h1>
           </div>
 

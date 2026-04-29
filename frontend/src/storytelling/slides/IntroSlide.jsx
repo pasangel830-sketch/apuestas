@@ -23,7 +23,7 @@ export default function IntroSlide() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          Una porra Web3 que se entiende tocando el sistema.
+          Apuestas y Web3
         </motion.h2>
 
         <p className="mt-4 max-w-[70ch] text-pretty text-sm leading-relaxed text-[var(--text-secondary)] sm:text-base">
