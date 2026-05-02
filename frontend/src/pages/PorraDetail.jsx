@@ -159,6 +159,9 @@ function PorraDetail() {
   }, [gameAddress]);
 
   useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H1+H5',location:'PorraDetail.jsx:startResSuccess-effect',message:'tx-receipt-effect',data:{startResSuccess:!!startResSuccess,startResHash:startResHash?String(startResHash):null,matchId:matchId?String(matchId):null},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     if (!startResSuccess || !startResHash || matchId == null) return;
     const key = `${startResHash}-${String(matchId)}`;
     if (fulfillOnceRef.current === key) return;
@@ -225,6 +228,9 @@ function PorraDetail() {
   const rawState = gameState ? Number(gameState[0]) : null;
   if (rawState != null && !Number.isNaN(rawState)) lastKnownStateRef.current = rawState;
   const state = rawState ?? lastKnownStateRef.current;
+  // #region agent log
+  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H1+H3',location:'PorraDetail.jsx:render',message:'render-state',data:{gameAddress,rawState,lastKnown:lastKnownStateRef.current,state,gameStateRaw:gameState?String(gameState[0]):null,blockNumber:blockNumber?String(blockNumber):null},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   const isBetting = state === 0;
   const isResolving = state === 1;
   const isClaiming = state === 2 || state === 3;
@@ -299,6 +305,9 @@ function PorraDetail() {
   };
 
   const handleStartResolution = () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H1+H4',location:'PorraDetail.jsx:handleStartResolution',message:'click-startResolution',data:{gameAddress,state,rawState,lastKnown:lastKnownStateRef.current,isBetting,isResolving,isClaiming,gameStateRaw:gameState?String(gameState[0]):null},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     if (!gameAddress) return;
     startResWrite({
       address: gameAddress,
@@ -309,6 +318,9 @@ function PorraDetail() {
   };
 
   const handleResolveWithOracle = () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H2+H4',location:'PorraDetail.jsx:handleResolveWithOracle',message:'click-resolveWithOracle',data:{gameAddress,state,rawState,lastKnown:lastKnownStateRef.current,isBetting,isResolving,isClaiming,gameStateRaw:gameState?String(gameState[0]):null},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     if (!gameAddress) return;
     resolveWrite({
       address: gameAddress,
