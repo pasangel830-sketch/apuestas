@@ -1385,7 +1385,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.75rem 1.5rem;
+  padding: 3.25rem 1.5rem 1.75rem;
   margin: 0 0 1.5rem;
   border-radius: 12px;
   overflow: hidden;
@@ -1476,7 +1476,10 @@
 
 .page.home .home-hero__badge {
   display: inline-block;
-  margin: 0 0 0.65rem;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  margin: 0;
   padding: 0.35rem 0.7rem;
   font-size: 0.72rem;
   font-weight: 600;
@@ -1486,15 +1489,6 @@
   background: rgba(2, 6, 23, 0.45);
   border-radius: 999px;
   border: 1px solid rgba(56, 189, 248, 0.28);
-}
-
-.page.home .home-hero__title {
-  margin: 0 0 0.8rem;
-  font-size: clamp(1.85rem, 4vw, 2.35rem);
-  line-height: 1.15;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #e0f2fe;
 }
 
 .page.home .home-hero__subtitle {

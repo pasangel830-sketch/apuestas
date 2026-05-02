@@ -68,7 +68,7 @@ function Home() {
     <div className="page home">
       <motion.section
         className="home-hero"
-        aria-labelledby="home-hero-title"
+        aria-label="BuddyBets"
         variants={
           reduceMotion
             ? { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.2 } } }
@@ -77,9 +77,6 @@ function Home() {
         initial="hidden"
         animate="show"
       >
-        <motion.h1 id="home-hero-title" className="home-hero__title" variants={reduceMotion ? heroItemReduced : heroItem}>
-          BuddyBets
-        </motion.h1>
         <motion.div
           className="home-hero__brand"
           variants={
