@@ -77,6 +77,9 @@ function Home() {
         initial="hidden"
         animate="show"
       >
+        <motion.h1 id="home-hero-title" className="home-hero__title" variants={reduceMotion ? heroItemReduced : heroItem}>
+          BuddyBets
+        </motion.h1>
         <motion.div
           className="home-hero__brand"
           variants={
@@ -99,9 +102,6 @@ function Home() {
         <motion.p className="home-hero__badge" variants={reduceMotion ? heroItemReduced : heroItem}>
           Porras entre amigos
         </motion.p>
-        <motion.h1 id="home-hero-title" className="home-hero__title" variants={reduceMotion ? heroItemReduced : heroItem}>
-          BuddyBets
-        </motion.h1>
         <motion.p className="home-hero__subtitle" variants={reduceMotion ? heroItemReduced : heroItem}>
           Crea una porra privada para el próximo partido, invita a tu grupo y que gane quien acierte el
           resultado. Rápido, claro y pensado para compartir.
