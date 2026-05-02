@@ -27,9 +27,7 @@ function PorraDetail() {
   const chainId = useChainId();
   const { data: balanceData } = useBalance({ address });
   const { data: blockNumber } = useBlockNumber({ watch: true });
-  const readScopeKey = gameAddress && blockNumber != null
-    ? `${gameAddress}-${blockNumber.toString()}`
-    : gameAddress;
+  const readScopeKey = gameAddress;
 
   const { data: gameState } = useReadContract({
     address: gameAddress,
@@ -146,12 +144,16 @@ function PorraDetail() {
   const { isLoading: claimConfirming } = useWaitForTransactionReceipt({ hash: claimHash });
 
   const publicClient = usePublicClient();
+  const lastKnownStateRef = useRef(null);
+  const deadlinePassedLatchedRef = useRef(false);
   const fulfillOnceRef = useRef(null);
   const [fulfillMsg, setFulfillMsg] = useState(null);
   const [fulfillErr, setFulfillErr] = useState(null);
 
   useEffect(() => {
     fulfillOnceRef.current = null;
+    lastKnownStateRef.current = null;
+    deadlinePassedLatchedRef.current = false;
     setFulfillMsg(null);
     setFulfillErr(null);
   }, [gameAddress]);
@@ -220,7 +222,9 @@ function PorraDetail() {
 
   const chainTimeEst = useChainTimeEstimate(blockNumber, [placeBetHash, startResHash, resolveHash, claimHash]);
 
-  const state = gameState ? Number(gameState[0]) : 0;
+  const rawState = gameState ? Number(gameState[0]) : null;
+  if (rawState != null && !Number.isNaN(rawState)) lastKnownStateRef.current = rawState;
+  const state = rawState ?? lastKnownStateRef.current;
   const isBetting = state === 0;
   const isResolving = state === 1;
   const isClaiming = state === 2 || state === 3;
@@ -230,6 +234,8 @@ function PorraDetail() {
   // Solo bloquear por saldo cuando hemos cargado el balance; si balanceData es undefined (p. ej. otra red), no bloquear
   const insufficientBalance = stakeWeiBig > 0n && balanceData != null && balanceWei < stakeWeiBig;
   const deadlinePassed = bettingDeadline != null && chainTimeEst != null && chainTimeEst > Number(bettingDeadline);
+  if (deadlinePassed) deadlinePassedLatchedRef.current = true;
+  const deadlinePassedLatched = deadlinePassedLatchedRef.current;
   const matchEndTs = matchEndTime != null ? Number(matchEndTime) : null;
   const resolutionAvailable = matchEndTs != null && chainTimeEst != null && chainTimeEst >= matchEndTs;
   const placeBetFailedMessage = placeBetError?.shortMessage ?? placeBetError?.message ?? placeBetReceiptErr?.shortMessage ?? placeBetReceiptErr?.message;
@@ -279,7 +285,7 @@ function PorraDetail() {
 
   const handlePlaceBet = (prediction) => {
     if (!gameAddress || prediction === undefined || stakeWei == null || stakeWei === undefined) return;
-    if (insufficientBalance || deadlinePassed) return;
+    if (insufficientBalance || deadlinePassedLatched) return;
     const valueWei = typeof stakeWei === 'bigint' ? stakeWei : BigInt(stakeWei);
     if (valueWei <= 0n) return;
     placeBetWrite({
@@ -376,7 +382,7 @@ function PorraDetail() {
             <div className="porra-detail-summary__stat">
               <span className="porra-detail-summary__stat-label">Fase</span>
               <span className="porra-detail-summary__stat-value">
-                {GAME_STATE_LABELS[state] ?? state}
+                {state == null ? '—' : (GAME_STATE_LABELS[state] ?? state)}
               </span>
             </div>
             <div className="porra-detail-summary__stat">
@@ -436,7 +442,7 @@ function PorraDetail() {
                   {stakeWei != null ? `${formatEther(stakeWei)} ETH` : '—'}
                 </span>
               </div>
-              {deadlinePassed && (
+              {deadlinePassedLatched && (
                 <div className="error-box" style={{ padding: '0.75rem', marginBottom: '0.75rem' }}>
                   <strong>Ya no puedes apostar en esta porra.</strong> El plazo para hacerlo ha terminado. Si quieres seguir jugando, crea una nueva porra con tiempo de sobra.
                 </div>
@@ -455,7 +461,7 @@ function PorraDetail() {
                     key={prediction}
                     type="button"
                     className="btn btn-outline porra-outcome-btn"
-                    disabled={placeBetPending || stakeWei == null || insufficientBalance || deadlinePassed}
+                    disabled={placeBetPending || stakeWei == null || insufficientBalance || deadlinePassedLatched}
                     onClick={() => handlePlaceBet(prediction)}
                   >
                     <span className="porra-outcome-btn__code">{code}</span>
@@ -478,7 +484,7 @@ function PorraDetail() {
           {isBetting && isWhitelisted && hasPlacedBet && (
             <p className="porra-actions-notice porra-actions-notice--done">Ya has apostado en esta porra.</p>
           )}
-          {isBetting && !isWhitelisted && (
+          {isBetting && isWhitelisted === false && (
             <p className="error-box" style={{ padding: '0.75rem', marginTop: '0.5rem' }}>
               No estás en la whitelist de esta porra. Solo pueden apostar las direcciones que el creador incluyó al crear la porra.
               {whitelistLines.length > 0 && (
