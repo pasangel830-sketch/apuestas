@@ -6,10 +6,6 @@ export default async function handler(req, res) {
   applyCors(req, res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  // #region agent log
-  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '269f79' }, body: JSON.stringify({ sessionId: '269f79', runId: 'pre-fix', hypothesisId: 'A', location: 'api/sports/results/[matchIdHex].mjs:10', message: 'hit /api/sports/results/:matchIdHex', data: { method: req.method, matchIdHex: req.query?.matchIdHex }, timestamp: Date.now() }) }).catch(() => {});
-  // #endregion
-
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   const fromQuery = req.query?.matchIdHex;

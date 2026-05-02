@@ -6,10 +6,6 @@ export default async function handler(req, res) {
   applyCors(req, res);
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  // #region agent log
-  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '269f79' }, body: JSON.stringify({ sessionId: '269f79', runId: 'pre-fix', hypothesisId: 'A', location: 'api/sports/results/index.mjs:10', message: 'hit /api/sports/results', data: { method: req.method, contentType: req.headers?.['content-type'] }, timestamp: Date.now() }) }).catch(() => {});
-  // #endregion
-
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   /** @type {{ matchIdString?: unknown, outcome?: unknown }} */
@@ -37,10 +33,6 @@ export default async function handler(req, res) {
 
   const trimmed = matchIdString.trim();
   const idHex = resultIdFromMatchIdString(trimmed);
-
-  // #region agent log
-  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '269f79' }, body: JSON.stringify({ sessionId: '269f79', runId: 'pre-fix', hypothesisId: 'A', location: 'api/sports/results/index.mjs:45', message: 'upsertResult input', data: { matchIdBytes32: idHex, outcome: o }, timestamp: Date.now() }) }).catch(() => {});
-  // #endregion
 
   try {
     await withPool(async (pool) => {
