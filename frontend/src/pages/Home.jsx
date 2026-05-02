@@ -1,13 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useAccount } from 'wagmi';
 
 const heroContainer = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+    transition: { staggerChildren: 0.14, delayChildren: 0.08 },
+  },
+};
+
+const heroLogo = {
+  hidden: {
+    opacity: 0,
+    scale: 0.78,
+    filter: 'blur(18px) brightness(0.45)',
+  },
+  show: {
+    opacity: 1,
+    scale: 1,
+    filter: 'blur(0px) brightness(1)',
+    transition: { duration: 1.35, ease: [0.16, 1, 0.3, 1] },
   },
 };
 
@@ -20,7 +34,13 @@ const heroItem = {
   },
 };
 
+const heroItemReduced = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: 0.15 } },
+};
+
 function Home() {
+  const reduceMotion = useReducedMotion();
   const { isConnected } = useAccount();
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,17 +69,40 @@ function Home() {
       <motion.section
         className="home-hero"
         aria-labelledby="home-hero-title"
-        variants={heroContainer}
+        variants={
+          reduceMotion
+            ? { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.2 } } }
+            : heroContainer
+        }
         initial="hidden"
         animate="show"
       >
-        <motion.p className="home-hero__badge" variants={heroItem}>
+        <motion.div
+          className="home-hero__brand"
+          variants={
+            reduceMotion
+              ? {
+                  hidden: { opacity: 0 },
+                  show: { opacity: 1, transition: { duration: 0.2 } },
+                }
+              : heroLogo
+          }
+        >
+          <img
+            src={`${import.meta.env.BASE_URL}buddy-betts-logo.png`}
+            alt=""
+            className="home-hero__logo"
+            decoding="async"
+            draggable={false}
+          />
+        </motion.div>
+        <motion.p className="home-hero__badge" variants={reduceMotion ? heroItemReduced : heroItem}>
           Porras entre amigos
         </motion.p>
-        <motion.h1 id="home-hero-title" className="home-hero__title" variants={heroItem}>
+        <motion.h1 id="home-hero-title" className="home-hero__title" variants={reduceMotion ? heroItemReduced : heroItem}>
           BuddyBets
         </motion.h1>
-        <motion.p className="home-hero__subtitle" variants={heroItem}>
+        <motion.p className="home-hero__subtitle" variants={reduceMotion ? heroItemReduced : heroItem}>
           Crea una porra privada para el próximo partido, invita a tu grupo y que gane quien acierte el
           resultado. Rápido, claro y pensado para compartir.
         </motion.p>
