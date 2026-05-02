@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAccount, useBalance, useChainId, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
 import PorraGameAbi from '../contracts/abi/PorraGame.json';
@@ -133,19 +134,21 @@ function PorraDetail() {
     scopeKey: readScopeKey,
   });
   const { data: placeBetHash, writeContract: placeBetWrite, isPending: placeBetPending, error: placeBetError } = useWriteContract();
-  const { isError: placeBetReceiptError, error: placeBetReceiptErr } = useWaitForTransactionReceipt({ hash: placeBetHash });
+  const { isError: placeBetReceiptError, isSuccess: placeBetSuccess, error: placeBetReceiptErr } = useWaitForTransactionReceipt({ hash: placeBetHash });
   const { data: startResHash, writeContract: startResWrite, isPending: startResPending } = useWriteContract();
   const { data: resolveHash, writeContract: resolveWrite, isPending: resolvePending } = useWriteContract();
   const { data: claimHash, writeContract: claimWrite, isPending: claimPending } = useWriteContract();
   const { isLoading: startResConfirming, isSuccess: startResSuccess } = useWaitForTransactionReceipt({
     hash: startResHash,
   });
-  const { isLoading: resolveConfirming } = useWaitForTransactionReceipt({ hash: resolveHash });
-  const { isLoading: claimConfirming } = useWaitForTransactionReceipt({ hash: claimHash });
+  const { isLoading: resolveConfirming, isSuccess: resolveSuccess } = useWaitForTransactionReceipt({ hash: resolveHash });
+  const { isLoading: claimConfirming, isSuccess: claimSuccess } = useWaitForTransactionReceipt({ hash: claimHash });
 
+  const queryClient = useQueryClient();
   const publicClient = usePublicClient();
   const lastKnownStateRef = useRef(null);
   const deadlinePassedLatchedRef = useRef(false);
+  const lastInvalidatedTxRef = useRef({ placeBet: null, startRes: null, resolve: null, claim: null });
   const fulfillOnceRef = useRef(null);
   const [fulfillMsg, setFulfillMsg] = useState(null);
   const [fulfillErr, setFulfillErr] = useState(null);
@@ -154,14 +157,50 @@ function PorraDetail() {
     fulfillOnceRef.current = null;
     lastKnownStateRef.current = null;
     deadlinePassedLatchedRef.current = false;
+    lastInvalidatedTxRef.current = { placeBet: null, startRes: null, resolve: null, claim: null };
     setFulfillMsg(null);
     setFulfillErr(null);
   }, [gameAddress]);
 
+  const invalidatePorraContractReads = useCallback(() => {
+    if (!gameAddress) return;
+    queryClient.invalidateQueries({
+      predicate: (q) => {
+        const key = q.queryKey;
+        if (!Array.isArray(key) || key[0] !== 'readContract' || typeof key[1] !== 'object' || !key[1]) return false;
+        const a = key[1].address;
+        return a != null && String(a).toLowerCase() === String(gameAddress).toLowerCase();
+      },
+    });
+  }, [gameAddress, queryClient]);
+
   useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H1+H5',location:'PorraDetail.jsx:startResSuccess-effect',message:'tx-receipt-effect',data:{startResSuccess:!!startResSuccess,startResHash:startResHash?String(startResHash):null,matchId:matchId?String(matchId):null},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
+    if (!gameAddress) return;
+    const markAndInvalidate = (slot, success, hash) => {
+      if (!success || !hash) return;
+      const h = String(hash);
+      if (lastInvalidatedTxRef.current[slot] === h) return;
+      lastInvalidatedTxRef.current[slot] = h;
+      invalidatePorraContractReads();
+    };
+    markAndInvalidate('placeBet', placeBetSuccess, placeBetHash);
+    markAndInvalidate('startRes', startResSuccess, startResHash);
+    markAndInvalidate('resolve', resolveSuccess, resolveHash);
+    markAndInvalidate('claim', claimSuccess, claimHash);
+  }, [
+    gameAddress,
+    placeBetSuccess,
+    placeBetHash,
+    startResSuccess,
+    startResHash,
+    resolveSuccess,
+    resolveHash,
+    claimSuccess,
+    claimHash,
+    invalidatePorraContractReads,
+  ]);
+
+  useEffect(() => {
     if (!startResSuccess || !startResHash || matchId == null) return;
     const key = `${startResHash}-${String(matchId)}`;
     if (fulfillOnceRef.current === key) return;
@@ -228,9 +267,6 @@ function PorraDetail() {
   const rawState = gameState ? Number(gameState[0]) : null;
   if (rawState != null && !Number.isNaN(rawState)) lastKnownStateRef.current = rawState;
   const state = rawState ?? lastKnownStateRef.current;
-  // #region agent log
-  fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H1+H3',location:'PorraDetail.jsx:render',message:'render-state',data:{gameAddress,rawState,lastKnown:lastKnownStateRef.current,state,gameStateRaw:gameState?String(gameState[0]):null,blockNumber:blockNumber?String(blockNumber):null},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   const isBetting = state === 0;
   const isResolving = state === 1;
   const isClaiming = state === 2 || state === 3;
@@ -305,9 +341,6 @@ function PorraDetail() {
   };
 
   const handleStartResolution = () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H1+H4',location:'PorraDetail.jsx:handleStartResolution',message:'click-startResolution',data:{gameAddress,state,rawState,lastKnown:lastKnownStateRef.current,isBetting,isResolving,isClaiming,gameStateRaw:gameState?String(gameState[0]):null},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
     if (!gameAddress) return;
     startResWrite({
       address: gameAddress,
@@ -318,9 +351,6 @@ function PorraDetail() {
   };
 
   const handleResolveWithOracle = () => {
-    // #region agent log
-    fetch('http://127.0.0.1:7834/ingest/c35bd949-6ee1-4bfc-9b71-b3fecbcb1813',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'2f1128'},body:JSON.stringify({sessionId:'2f1128',hypothesisId:'H2+H4',location:'PorraDetail.jsx:handleResolveWithOracle',message:'click-resolveWithOracle',data:{gameAddress,state,rawState,lastKnown:lastKnownStateRef.current,isBetting,isResolving,isClaiming,gameStateRaw:gameState?String(gameState[0]):null},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
     if (!gameAddress) return;
     resolveWrite({
       address: gameAddress,
