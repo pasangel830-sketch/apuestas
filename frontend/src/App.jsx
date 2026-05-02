@@ -8,6 +8,7 @@ import OracleMock from './pages/OracleMock';
 import Storytelling from './pages/Storytelling';
 import Smartcontracts from './pages/Smartcontracts';
 import BuddyBetsMVP from './pages/BuddyBetsMVP';
+import BuddyBetsPorraFlow from './pages/BuddyBetsPorraFlow';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/my-porras" element={<MyPorras />} />
         <Route path="/oracle-mock" element={<OracleMock />} />
         <Route path="/buddybettsmvp" element={<BuddyBetsMVP />} />
+        <Route path="/buddybettsmvp/flujo-porra" element={<BuddyBetsPorraFlow />} />
         <Route path="/storytelling" element={<Storytelling />} />
         <Route path="/smartcontracts" element={<Smartcontracts />} />
         <Route path="/porra/:gameAddress" element={<PorraDetail />} />
