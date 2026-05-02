@@ -622,7 +622,7 @@
 /* Paneles tipo mandos: títulos más compactos y jerarquía clara */
 .porra-detail-dashboard .home-hero__badge {
   margin-bottom: 0.45rem;
-  font-size: 0.68rem;
+  font-size: 0.42rem;
   letter-spacing: 0.08em;
 }
 
@@ -635,7 +635,7 @@
 }
 
 .porra-detail-dashboard .home-hero__subtitle {
-  font-size: 0.86rem;
+  font-size: 0.75rem;
   line-height: 1.5;
   margin-bottom: 0.6rem;
 }
@@ -1434,6 +1434,8 @@
   filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.25))
     drop-shadow(0 0 36px rgba(30, 78, 216, 0.35));
   animation: home-hero-logo-pulse 4.5s ease-in-out 1.4s infinite;
+  padding-top: 10px;
+  padding-bottom: 25px;
 }
 
 @keyframes home-hero-logo-shimmer {
