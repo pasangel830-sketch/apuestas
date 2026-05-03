@@ -12,7 +12,7 @@ export function HeroArt() {
             🚀 BuddyBets App
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[var(--text-primary)]">
-            Funcionamiento del FrontEnd. 🔒✨
+            Funcionamiento de la App. 🔒✨
           </p>
         </div>
 
@@ -51,7 +51,7 @@ export function HeroArt() {
   );
 }
 
-function ExternalCtaCard({ href, tone, eyebrow, title, desc }) {
+function ExternalCtaCard({ href, tone, eyebrow, title, desc, className = '' }) {
   const toneRing =
     tone === 'contracts'
       ? 'hover:border-purple-400/35 hover:shadow-[0_18px_46px_rgba(147,51,234,0.14)]'
@@ -63,10 +63,11 @@ function ExternalCtaCard({ href, tone, eyebrow, title, desc }) {
     <a
       href={href}
       className={[
-        'group block rounded-2xl border border-white/10 bg-white/[0.03] p-5 no-underline transition',
+        'group block h-full min-h-0 rounded-2xl border border-white/10 bg-white/[0.03] p-5 no-underline transition',
         'hover:bg-white/[0.05]',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)]',
         toneRing,
+        className,
       ].join(' ')}
     >
       <div className="flex items-start justify-between gap-4">
@@ -104,7 +105,7 @@ export default function BuddyBetsExploreSlide() {
         Clicka sobre cada tarjeta para entender cómo funciona la app por dentro😄📜💸.
       </p>
 
-      <div className="grid gap-3 lg:grid-cols-3">
+      <div className="grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <ExternalCtaCard
           href="https://buddybets-mu.vercel.app/guia"
           tone="oracle"
@@ -133,12 +134,10 @@ export default function BuddyBetsExploreSlide() {
           title="Confianza por diseño 🔐"
           desc="Arquitectura on-chain, comunicación y tests para que el bote y las reglas sean incuestionables."
         />
-      </div>
-
-      <Link
-        to="/buddybettsmvp/flujo-porra"
-        className="group block rounded-2xl border border-white/10 bg-white/[0.03] p-5 no-underline transition hover:bg-white/[0.05] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)] hover:border-amber-400/35 hover:shadow-[0_18px_46px_rgba(245,158,11,0.12)]"
-      >
+        <Link
+          to="/buddybettsmvp/flujo-porra"
+          className="group flex min-h-0 flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 no-underline transition hover:bg-white/[0.05] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-blue)] hover:border-amber-400/35 hover:shadow-[0_18px_46px_rgba(245,158,11,0.12)] sm:col-span-2 xl:col-span-2"
+        >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="m-0 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">PorraDetail</p>
@@ -158,7 +157,8 @@ export default function BuddyBetsExploreSlide() {
           <span className="inline-flex h-2 w-2 rounded-full bg-white/30 transition group-hover:bg-white/45" aria-hidden />
           <span className="opacity-85 group-hover:opacity-100">Ver guía detallada</span>
         </div>
-      </Link>
+        </Link>
+      </div>
 
       <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
         <p className="m-0 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">Tip de demo</p>
