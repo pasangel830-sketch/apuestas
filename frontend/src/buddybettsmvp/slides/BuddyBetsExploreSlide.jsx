@@ -106,6 +106,13 @@ export default function BuddyBetsExploreSlide() {
 
       <div className="grid gap-3 lg:grid-cols-3">
         <ExternalCtaCard
+          href="https://buddybets-mu.vercel.app/guia"
+          tone="oracle"
+          eyebrow="Guía"
+          title="PorraGame: guía rápida 📖"
+          desc="Resolución, cobro y flujo del contrato con la misma vista que el MVP, explicada paso a paso."
+        />
+        <ExternalCtaCard
           href="https://buddybets-mu.vercel.app/road_map.html"
           tone="frontend"
           eyebrow="Roadmap"

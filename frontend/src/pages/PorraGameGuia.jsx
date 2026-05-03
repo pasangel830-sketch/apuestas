@@ -354,8 +354,10 @@ resultado`}</span>,
                 <p className="m-0 font-semibold text-[var(--text-primary)]">🔁 ReentrancyGuard — El cerrojo anti-hacker</p>
                 <p className="m-0">Este es el ataque mas famoso en Ethereum. Asi funciona el hackeo:</p>
                 <pre className="m-0 max-h-[min(70vh,32rem)] overflow-auto rounded-xl border border-white/10 bg-black/50 p-4 text-left font-mono text-[11px] leading-relaxed text-slate-200 sm:text-xs">
-                  <code>{
-					  `Sin proteccion:
+                  <code>
+				  {
+					  `
+					  Sin proteccion:
 					  1. Hacker llama claimReward()
 					  2. El Contrato empieza a enviarle ETH...
 					  3. Antes de terminar, el hacker vuelve a llamar claimReward()
@@ -367,7 +369,9 @@ resultado`}</span>,
 					  2. El cerrojo se activa: 'estoy procesando'
 					  3. Hacker intenta llamar claimReward() de nuevo
 					  4. El cerrojo rechaza: 'ya hay una llamada activa'
-					  5. Error. El hacker no puede entrar.`}
+					  5. Error. El hacker no puede entrar.
+					  `
+					}
 				 </code>
                 </pre>
                 <p className="m-0 font-semibold text-[var(--text-primary)]">⏸ Pausable — El boton de emergencia</p>
