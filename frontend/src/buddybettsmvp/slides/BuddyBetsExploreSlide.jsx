@@ -12,7 +12,7 @@ export function HeroArt() {
             🚀 BuddyBets App
           </p>
           <p className="mt-2 text-sm leading-relaxed text-[var(--text-primary)]">
-            La porra que se siente como una app moderna y se comporta como un contrato serio. 🔒✨
+            Funcionamiento del FrontEnd. 🔒✨
           </p>
         </div>
 
@@ -101,7 +101,7 @@ export default function BuddyBetsExploreSlide() {
       </motion.h2>
 
       <p className="m-0 max-w-[80ch] text-sm leading-relaxed text-[var(--text-secondary)] sm:text-base">
-        Abre cualquiera y entiende el valor en segundos: emoción entre amigos 😄, reglas claras 📜 y pagos automáticos 💸.
+        Clicka sobre cada tarjeta para entender cómo funciona la app por dentro😄📜💸.
       </p>
 
       <div className="grid gap-3 lg:grid-cols-3">

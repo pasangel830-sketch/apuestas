@@ -99,7 +99,7 @@ export default function PorraGameGuia() {
 
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="m-0 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
-                  Guía PDF · documentación
+                  documentación
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Link
@@ -163,17 +163,7 @@ export default function PorraGameGuia() {
                 </ul>
                 <p className="m-0 font-semibold text-[var(--text-primary)]">📊 Vision global del sistema:</p>
                 <pre className="m-0 overflow-x-auto whitespace-pre-wrap rounded-xl border border-white/10 bg-black/40 p-4 font-sans text-xs leading-relaxed text-[var(--text-primary)] sm:text-sm">
-{`👤 TU Apuestas
-ETH 	➡
-📦 CONTRATO
-Guarda el bote 	⬅
-🤖 ORACULO Da
-el resultado 	➡
-🏆
-COBR
-A Si
-acertas
-te`}
+{`👤 TU Apuestas ETH ➡📦 CONTRATO Guarda el bote 	⬅ 🤖 ORACULO Da el resultado 	➡ 🏆 COBRA Si acertaste`}
                 </pre>
               </GuideSection>
 
@@ -272,18 +262,7 @@ resultado`}</span>,
                 <p className="m-0 pt-2 font-semibold text-[var(--text-primary)]">🎯 PASO 1 — Los jugadores apuestan (placeBet)</p>
                 <p className="m-0">
                   Cada jugador llama a placeBet(0/1/2) enviando ETH. El contrato hace 6 comprobaciones antes de aceptar:
-                </p>
-                <p className="m-0 font-mono text-xs text-[var(--text-secondary)] sm:text-sm">
-                  C
-                  <br />
-                  H
-                  <br />
-                  E
-                  <br />
-                  C
-                  <br />
-                  K
-                </p>
+                </p>               
                 <GuideTable
                   headers={['', 'Condicion', 'Si falla...']}
                   rows={[
@@ -299,18 +278,7 @@ resultado`}</span>,
 
               <PageBreak n={4} total={11} />
 
-              <GuideSection id="sec-4b" title="" eyebrow="4 Flujo (continuación)">
-                <p className="m-0 font-mono text-xs text-[var(--text-secondary)] sm:text-sm">
-                  C
-                  <br />
-                  H
-                  <br />
-                  E
-                  <br />
-                  C
-                  <br />
-                  K
-                </p>
+              <GuideSection id="sec-4b" title="" eyebrow="4 Flujo (continuación)">               
                 <GuideTable
                   headers={['', 'Condicion', 'Si falla...']}
                   rows={[['✅', '6 El jugador NO había apostado antes', "Error: 'already bet'"]]}
@@ -386,19 +354,21 @@ resultado`}</span>,
                 <p className="m-0 font-semibold text-[var(--text-primary)]">🔁 ReentrancyGuard — El cerrojo anti-hacker</p>
                 <p className="m-0">Este es el ataque mas famoso en Ethereum. Asi funciona el hackeo:</p>
                 <pre className="m-0 max-h-[min(70vh,32rem)] overflow-auto rounded-xl border border-white/10 bg-black/50 p-4 text-left font-mono text-[11px] leading-relaxed text-slate-200 sm:text-xs">
-                  <code>{`Sin proteccion:1. Hacker llama
-claimReward()2. El Contrato empieza a
-enviarle ETH...3. Antes de terminar, el
-hacker vuelve a llamar claimReward()4. El
-contrato envía ETH otra vez (y otra, y
-otra...)5. El contrato queda vacio. DAO
-hack de 2016: 60 millones de $ robados.
-Con nonReentrant:1. Hacker llama
-claimReward()2. El cerrojo se activa: 'estoy
-procesando'3. Hacker intenta llamar
-claimReward() de nuevo4. El cerrojo
-rechaza: 'ya hay una llamada activa'5.
-Error. El hacker no puede entrar.`}</code>
+                  <code>{
+					  `Sin proteccion:
+					  1. Hacker llama claimReward()
+					  2. El Contrato empieza a enviarle ETH...
+					  3. Antes de terminar, el hacker vuelve a llamar claimReward()
+					  4. El contrato envía ETH otra vez (y otra, y otra...)
+					  5. El contrato queda vacio. DAO hack de 2016: 60 millones de $ robados.
+
+					  Con nonReentrant:
+					  1. Hacker llama claimReward()
+					  2. El cerrojo se activa: 'estoy procesando'
+					  3. Hacker intenta llamar claimReward() de nuevo
+					  4. El cerrojo rechaza: 'ya hay una llamada activa'
+					  5. Error. El hacker no puede entrar.`}
+				 </code>
                 </pre>
                 <p className="m-0 font-semibold text-[var(--text-primary)]">⏸ Pausable — El boton de emergencia</p>
                 <ul className="m-0 list-disc pl-5">
